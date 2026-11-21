@@ -7,7 +7,7 @@ description: mode, device and os, location.
 |---|---|---|
 | `mode` | `fast` (default), `full` | every plan |
 | `device` + `os` | `desktop` with `win`, `linux`, `macos`; `mobile` with `android`, `ios` | Basic and up |
-| `location` | two-letter country code | Ultimate |
+| `location` | two-letter country code | Ultimate; chosen for you on Pro and up |
 
 An attribute name the API does not know is refused with `422`, with `source.pointer` naming it.
 
@@ -38,3 +38,7 @@ The country the crawl is made from.
 
 - Below Ultimate, any value: `403 forbidden_entitlement`, `meta.required-service: geo_routing`.
 - On Ultimate: two letters, either case, stored uppercase; anything else is `422`. The code is not checked against a country list here — one the crawler does not accept makes the request `failed`.
+
+### Chosen for you
+
+On Pro, Ultimate and Enterprise, a request without `location` is crawled from the country of the site's national domain — `.de` → `DE`, `.co.uk` → `GB` — when the crawler has an exit there: US, GB, DE, FR, JP, RU. The request then shows that `location`. Other sites (`.com`, `.io`, national domains outside the list) are crawled without one. An explicit `location` always wins.

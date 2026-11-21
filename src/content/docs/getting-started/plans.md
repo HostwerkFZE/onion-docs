@@ -14,7 +14,8 @@ Values from the plan catalogue, [`GET /api/v1/plans`](https://user.onion4.ai/api
 | History retention | 14 days | unlimited | unlimited | unlimited |
 | WebSocket (live updates) | — | ✓ | ✓ | ✓ |
 | `device` / `os` | — | ✓ | ✓ | ✓ |
-| `location` | — | — | — | ✓ |
+| `location` | — | — | chosen for the site | ✓ |
+| Webhooks | — | ✓ | ✓ | ✓ |
 
 Enterprise is negotiated individually.
 

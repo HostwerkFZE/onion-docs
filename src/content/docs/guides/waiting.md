@@ -10,6 +10,7 @@ A submission returns an `id` immediately; the crawl runs afterwards. Reads (stat
 | [Poll the result](#poll-the-result) | every plan |
 | [Poll the status with `ETag`](#poll-the-status-with-etag) | every plan |
 | [WebSocket](#websocket) | Basic and up |
+| [Webhook](/guides/webhooks/) — a call to your endpoint | Basic and up |
 
 ## Poll the result
 
