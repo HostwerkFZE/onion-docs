@@ -28,7 +28,20 @@ Before that it returns `200` with `{"data": null, "meta": {"request-id": "…", 
 
 The data is downloaded from `download-url`, a presigned link valid until `url-expires-at`. Request it without the `Authorization` header. For a new link, read the result again.
 
-The format follows the instruction ("return the result in json", "as CSV"); `content-type` gives the format returned. `output-format` is accepted and stored on the request but does not change the result.
+The format follows the instruction ("return the result in json", "as CSV"); `content-type` gives the format returned.
+
+`output-format` adds that sentence to the instruction the crawler receives, unless the instruction already has it:
+
+| `output-format` | Sentence added |
+|---|---|
+| `json` | Return the results in JSON format. |
+| `csv` | Return the results in CSV format. |
+| `table` | Return the results as a Markdown table. |
+| `markdown` | Return the results as Markdown. |
+| `text` | Return the results as plain text. |
+| `schema` | none — the shape comes from `result-schema` |
+
+The request's `prompt` stays your text, and the [size limit](/guides/instructions/#size-limit) counts only it. An instruction that the sentence would take past 8,192 characters is refused with `422`.
 
 ## Structured extraction
 

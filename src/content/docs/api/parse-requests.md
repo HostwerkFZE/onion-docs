@@ -20,8 +20,8 @@ description: Submit, list, and read status, result, events and artifacts.
 | `mode` | `fast` \| `full` | Default `fast`. [Crawl options](/guides/crawl-options/#mode) |
 | `result-schema` | object | JSON Schema for the result. [Structured extraction](/guides/results/#structured-extraction) |
 | `device`, `os` | string | Both or neither. Basic and up. [Crawl options](/guides/crawl-options/#device-and-os) |
-| `location` | string | Two-letter country code. Ultimate. [Crawl options](/guides/crawl-options/#location) |
-| `output-format` | `markdown` \| `text` \| `json` \| `table` \| `csv` \| `schema` | Stored and returned; does not change the result. |
+| `location` | string | Two-letter country code. Ultimate; on Pro and up chosen from the site's domain when omitted. [Crawl options](/guides/crawl-options/#location) |
+| `output-format` | `markdown` \| `text` \| `json` \| `table` \| `csv` \| `schema` | Adds a format sentence to the instruction the crawler receives. [Results](/guides/results/#data) |
 | `fresh-data` | boolean | Reserved. `true`: `403` below Ultimate, `422 not_available` on Ultimate. |
 | `idempotency-key` | string | Same as the `Idempotency-Key` header. |
 
@@ -43,7 +43,7 @@ description: Submit, list, and read status, result, events and artifacts.
   "links": { "self": "/api/v1/parse-requests/6f1c…" } } }
 ```
 
-`device`, `os` and `location` appear in the resource only when they were sent.
+`device` and `os` appear in the resource only when they were sent; `location`, when it was sent or [chosen for the site](/guides/crawl-options/#chosen-for-you).
 
 ## List
 

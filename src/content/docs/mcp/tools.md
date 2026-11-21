@@ -21,7 +21,7 @@ description: Parameters and outputs of the Onion MCP tools.
 | `url` | string | The page. Optional if `prompt` contains exactly one http(s) URL. Without `prompt`, the raw HTML of the page is returned. |
 | `mode` | `fast` \| `full` | Default `fast`. [Crawl options](/guides/crawl-options/#mode) |
 | `result_schema` | object | JSON Schema for the result. Requires a key. |
-| `output_format` | `markdown` \| `text` \| `json` \| `table` \| `csv` \| `schema` | Requires a key. Stored on the request; the format follows the instruction. |
+| `output_format` | `markdown` \| `text` \| `json` \| `table` \| `csv` \| `schema` | Requires a key. Adds a format sentence to the instruction. [Results](/guides/results/#data) |
 | `idempotency_key` | string, 8–128 | Resubmitting with the same key returns the original job. |
 
 Output: `job_id`, `status`, `url`, `mode`, `note`.

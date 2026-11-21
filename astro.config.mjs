@@ -112,6 +112,7 @@ export default defineConfig({
 							items: [
 								{ label: 'Crawl options', slug: 'guides/crawl-options' },
 								{ label: 'Waiting for results', slug: 'guides/waiting' },
+								{ label: 'Webhooks', slug: 'guides/webhooks' },
 								{ label: 'Safe retries', slug: 'guides/retries' },
 								{ label: 'Rate limits and concurrency', slug: 'guides/rate-limits' },
 								{ label: 'Handling errors', slug: 'guides/errors' },
