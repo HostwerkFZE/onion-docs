@@ -27,8 +27,9 @@ Node 22.23.4 or newer.
 3. Link to other pages from the site root — `[limits](/guides/rate-limits/)` —
    the base path is added at build time.
 
-The four top-level sidebar groups are the topics shown as tabs in the header
-(`src/components/topics.ts`); a page's sidebar shows only its own topic
+The four top-level sidebar groups are the topics (`src/components/topics.ts`),
+shown as tabs in the header from 72rem and at the top of the sidebar below
+that (`TopicNav.astro`); a page's sidebar shows only its own topic
 (`src/route-middleware.ts`).
 
 What goes here: what a customer can do with an API key or through MCP, as the

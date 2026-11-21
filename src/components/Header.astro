@@ -15,10 +15,12 @@ const active = currentTopic(Astro.url.pathname);
 		<SiteTitle />
 		<a class="docs-pill" href={withBase('')}>Docs</a>
 	</div>
+	{/* From 72rem; below that the topics are at the top of the sidebar (TopicNav).
+	    A tab marks the page's topic, not the page: aria-current="true". */}
 	<nav class="topics sl-hidden lg:sl-flex print:hidden" aria-label="Topics">
 		{
 			topics.map((t) => (
-				<a href={withBase(t.href)} aria-current={active === t ? 'page' : undefined}>
+				<a href={withBase(t.href)} aria-current={active === t ? 'true' : undefined}>
 					{t.label}
 				</a>
 			))
@@ -79,10 +81,10 @@ const active = currentTopic(Astro.url.pathname);
 	.topics a:hover {
 		color: var(--fg-primary);
 	}
-	.topics a[aria-current='page'] {
+	.topics a[aria-current='true'] {
 		color: var(--fg-primary);
 	}
-	.topics a[aria-current='page']::after {
+	.topics a[aria-current='true']::after {
 		content: '';
 		position: absolute;
 		left: 0.75rem;

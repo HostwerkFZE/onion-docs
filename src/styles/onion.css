@@ -540,13 +540,16 @@ button.sl-menu-button:has(~ :popover-open) {
 	background: var(--brand-deep);
 	border-color: var(--border-brand);
 }
-#starlight__sidebar .mobile-topics a {
+/* The topic switcher at the top of the sidebar (TopicNav.astro), as chips. */
+#starlight__sidebar .topic-nav a {
 	border: 1px solid var(--border-default);
 	border-radius: 10px;
 	background: var(--bg-surface-1);
 	padding: 8px 12px;
+	text-decoration: none;
+	white-space: nowrap;
 }
-#starlight__sidebar .mobile-topics a[aria-current='page'] {
+#starlight__sidebar .topic-nav a[aria-current='true'] {
 	color: var(--fg-primary);
 	background: var(--brand-deep);
 	border-color: var(--border-brand);

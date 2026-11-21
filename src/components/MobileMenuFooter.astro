@@ -1,46 +1,14 @@
 ---
+// The phone menu's footer: the social links. The topics are at the top of the
+// menu (TopicNav, via Sidebar.astro).
 import SocialIcons from 'virtual:starlight/components/SocialIcons';
-import { topics, withBase, currentTopic } from './topics';
-
-const active = currentTopic(Astro.url.pathname);
 ---
 
-{/* On a phone the header has no room for the topic tabs; they live here. */}
-<nav class="mobile-topics" aria-label="Topics">
-	{
-		topics.map((t) => (
-			<a href={withBase(t.href)} aria-current={active === t ? 'page' : undefined}>
-				{t.label}
-			</a>
-		))
-	}
-</nav>
 <div class="mobile-preferences sl-flex">
 	<div class="social-icons"><SocialIcons /></div>
 </div>
 
 <style>
-	.mobile-topics {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.5rem;
-		padding: 1rem 0;
-		border-top: 1px solid var(--border-default);
-	}
-	.mobile-topics a {
-		padding: 0.5rem 0.75rem;
-		border: 1px solid var(--border-default);
-		border-radius: 10px;
-		background: var(--bg-surface-1);
-		color: var(--fg-tertiary);
-		font: var(--font-label-lg);
-		text-decoration: none;
-	}
-	.mobile-topics a[aria-current='page'] {
-		color: var(--fg-primary);
-		border-color: var(--border-brand);
-		background: var(--brand-deep);
-	}
 	.mobile-preferences {
 		justify-content: space-between;
 		align-items: center;
