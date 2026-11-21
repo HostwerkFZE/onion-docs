@@ -1,9 +1,9 @@
 ---
 title: Sending feedback
-description: Tell Onion when an answer was stale, incomplete or wrong — the one signal only the caller can produce.
+description: Reporting whether a result was correct.
 ---
 
-Onion knows what it fetched and whether the extraction found anything. Whether the answer was **useful** — the price was last month's, "no data" was wrong because the page plainly has it, the instruction was read backwards — only the caller who acted on it finds out. Feedback is where that goes, and it is how extraction gets better.
+`POST /api/v1/feedback` records a verdict on a result.
 
 ```sh
 curl -sS -X POST https://user.onion4.ai/api/v1/feedback \
@@ -12,24 +12,15 @@ curl -sS -X POST https://user.onion4.ai/api/v1/feedback \
   -d '{"data":{"type":"feedback","attributes":{
         "request-id":"<REQUEST_ID>",
         "verdict":"wrong",
-        "detail":"the price is last month'"'"'s; the page shows 129.99 today"}}}'
+        "detail":"price shown on the page is 129.99, the result says 119.99"}}}'
 ```
 
-The answer is `201` with the feedback's id.
-
-## Verdicts
-
-| Verdict | When |
+| Attribute | |
 |---|---|
-| `helpful` | The answer was right and usable. |
-| `incomplete` | Right as far as it went, but something was missing. |
-| `wrong` | The answer was incorrect. |
-| `unusable` | It could not be used at all. |
+| `verdict` | `helpful`, `incomplete`, `wrong` or `unusable`. Required. |
+| `request-id` | The request the verdict is about. Optional: without it the feedback is about the service. |
+| `detail` | What was wrong. Required for every verdict except `helpful`; up to 4096 bytes. |
 
-Anything but `helpful` must carry a `detail` (up to 4,096 characters): what was wrong, and what you expected instead. "It was bad" cannot be reproduced; "the page shows 129.99, the answer said 119.99" can.
+The answer is `201` with the feedback `id`. A request that is not yours: `404`. A `request-id` that is not a UUID: `422`.
 
-## Who may judge
-
-Whoever may read a request may judge it: its owner, with a key or in the dashboard. Feedback on a request that is not yours is `404`, exactly like reading it. `request-id` may be left out for feedback about the service in general.
-
-AI agents send the same signal through the MCP [`feedback` tool](/mcp/tools/#feedback).
+MCP clients send the same thing with the [`feedback` tool](/mcp/tools/#feedback).

@@ -1,53 +1,53 @@
 ---
 title: How a request works
-description: The four statuses, the three ways a request can turn out, and the stages in between.
+description: Request statuses, result outcomes and pipeline events.
 ---
 
-A parse request is one URL plus one instruction. From the moment you submit it, it has an `id` and a `status`, and it moves forward only:
+A parse request is one URL and one instruction. It gets an `id` on submission and moves through these statuses:
 
 ```
 queued ──► processing ──► ready
                      └──► failed
 ```
 
-| Status | Means |
+| Status | Meaning |
 |---|---|
-| `queued` | Accepted and waiting for a free slot of your plan's [requests at once](/guides/rate-limits/#requests-at-once). It starts on its own; nothing needs re-sending. |
-| `processing` | The page is being fetched or rendered, and your instruction applied to it. |
-| `ready` | Finished. The [result](/guides/results/) is there to read. |
-| `failed` | Finished without a result. `error` says why. |
+| `queued` | Accepted; waiting for a free slot of the plan's [requests at once](/guides/rate-limits/#requests-at-once). Starts automatically. |
+| `processing` | Sent to the crawler: the page is fetched or rendered and the instruction applied. |
+| `ready` | Finished with a [result](/guides/results/). |
+| `failed` | Finished without a result; `error` holds the reason. |
 
-A request that has started and stops making progress is failed by Onion after a timeout, so a slot is never held for good. One that is still `queued` is left alone, however long it waits — it has not had its chance yet.
+A `processing` request that has no result within a fixed time after it was sent to the crawler is set to `failed` ("request timed out before the crawler produced a result"). `queued` requests have no time limit.
 
-## Three outcomes, only one of them an error
+## Outcomes
 
-`ready` does not by itself mean "here is your data". The result says which of these happened:
+| Status | Result | Meaning |
+|---|---|---|
+| `ready` | `data-found: true` | The page held the requested data. |
+| `ready` | `data-found: false` | Nothing matching was extracted; `reason` explains why. `block-class` set — the final page was classified as blocked (`cf_challenge`, `captcha`, `forbidden`, …), not empty. `suggested-url` set — a page on the same site where the data is more likely. |
+| `failed` | — | No result. The crawler finished the task without success (`error-code` gives its code), was unreachable, rejected the task (for example an invalid `result-schema`), or the request timed out. `error` holds the message. |
 
-- **Data found.** `data-found: true` — the page held what you asked for, and the download is it.
-- **Nothing to find.** `data-found: false` with a `reason`. The page was read and does not contain what you asked for. Retrying will give the same answer; change the URL or the instruction instead.
-- **The site refused.** `block-class` is set (for example `cf_challenge`): the site answered with a challenge or a block page. It is a heuristic and a hint — read it together with `http-status`, because it can be set on a page that was served in full.
+## Events
 
-`failed` is the remaining case: the crawl or the extraction did not complete. That is the one worth retrying later.
-
-:::tip
-Keep these apart in your client. Treating "nothing found" as an error teaches it to retry something that will never succeed.
-:::
-
-## Watching the stages
-
-While a request runs, `GET /parse-requests/{id}/events` lists what the pipeline has done so far, in order — planning, the crawl with its HTTP status, the turns of the extraction, the end:
+`GET /parse-requests/{id}/events` returns the crawler's progress events for the request, in order:
 
 ```json
 { "data": [
-  { "seq": 2, "event": "task.planned", "type": "phase", "at": "…",
-    "detail": { "state": "running", "phase": "crawling" } },
-  { "seq": 3, "event": "crawl_job.succeeded", "type": "event", "at": "…",
-    "detail": { "crawl_seq": 1, "http_status": 200 } }
+  { "seq": 1, "event": "queued",              "type": "phase", "at": "…", "detail": { … } },
+  { "seq": 2, "event": "crawling",            "type": "phase", "at": "…", "detail": { … } },
+  { "seq": 3, "event": "crawl_job.created",   "type": "event", "at": "…", "detail": { … } },
+  { "seq": 4, "event": "crawl_job.succeeded", "type": "event", "at": "…",
+    "detail": { "http_status": 200, "block_class": null, … } },
+  { "seq": 5, "event": "extracting",          "type": "phase", "at": "…", "detail": { … } }
 ] }
 ```
 
-That is how you tell "slow" from "stuck". `seq` is dense and grows by one, so a gap is visible. The list is commentary, though: an empty one is not a stall, and the request's own `status` is always the authority on where it stands.
+- `event` — the crawler's name for the phase or event.
+- `detail` — the crawler's event object as received.
+- `seq` — increases by one per event; a gap means an event was not received.
 
-## Where requests come from
+Events are informational and may be missing; the request's `status` is authoritative.
 
-Every request records its `source` — `api`, `mcp` or `web` — from the credential it was made with, so your history and activity show which door each one came through.
+## Source
+
+Every request records `source`: `api` for a submission with an API key, `mcp` for one made through the MCP server, `web` for the dashboard and the playground.

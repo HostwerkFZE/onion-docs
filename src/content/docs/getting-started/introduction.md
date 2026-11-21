@@ -1,41 +1,35 @@
 ---
 title: Introduction
-description: What Onion does, the three ways to reach it, and what happens to a request.
+description: What Onion does, the ways to reach it, and the request flow.
 ---
 
-Onion extracts data from webpages. You give it a **URL** and an **instruction in plain language** — "extract product names, prices and availability" — and it gives you back the data, in the format you asked for.
+Onion extracts data from a webpage: you send a URL and an instruction in plain language ("extract product names, prices and availability"), Onion crawls the page, applies the instruction with a language model and returns the result.
 
-Behind that one call Onion opens the page (rendering it when the content is drawn by scripts), gets past the defences that turn ordinary scrapers away, and reads the page with a language model that follows your instruction. You do not write selectors, run browsers or rotate proxies.
+## Access
 
-## Three ways in, one product
-
-| Door | Who it is for | Credential |
+| | For | Credential |
 |---|---|---|
-| [HTTP API](/getting-started/quickstart/) | your code: a script, a backend, a cron job | an API key |
-| [MCP server](/mcp/overview/) | an AI agent: Claude, Cursor, any MCP client | an API key, or none |
-| [Playground](https://onion4.ai/) and [dashboard](https://user.onion4.ai/) | a person, in the browser | none, or a session |
+| [HTTP API](/getting-started/quickstart/) | your code | API key |
+| [MCP server](/mcp/overview/) | AI agents (Claude, Cursor, other MCP clients) | API key, or none |
+| [Dashboard](https://user.onion4.ai/) | a person in the browser | session |
+| [Playground](https://onion4.ai/) | trying it without an account | none |
 
-They are the same product. A request made through any of them lands in the same request history, counts against the same plan, and can be read, watched and judged the same way. The only things kept to the dashboard are the ones that manage the account itself: keys, plan, settings.
+Requests made with a key or a session belong to the account: they appear in its request history and count against its plan. Requests without credentials (the playground, MCP without a key) are anonymous: limited per IP address and not stored in any account.
 
-## What happens to a request
+Keys, plan, settings, password and two-factor authentication are managed only in the dashboard.
 
-1. **You submit** a URL and an instruction. Onion answers at once with an `id` and the status `queued`.
-2. **It runs.** When a slot of your plan is free, the request moves to `processing`: the page is fetched or rendered, and the instruction is applied to it.
-3. **It settles** as `ready` — with a result you can download — or `failed`, with the reason.
+## Request flow
 
-Crawls take seconds to minutes, so the API never makes you hold a connection open for the whole job: you submit, then [wait for the result](/guides/waiting/) the way that suits you — poll, open a WebSocket, or let an MCP tool wait for you.
+1. Submit a URL and an instruction. The answer is an `id` and the status `queued`.
+2. When the plan has a free slot, the request becomes `processing`: the page is fetched or rendered and the instruction applied.
+3. The request ends as `ready` with a result, or `failed` with a reason.
 
-:::note[Nothing found is an answer, not an error]
-A request can be `ready` and still report `data-found: false` with a `reason`: the page was read and did not contain what you asked for. That is different from a site refusing the crawl, and both are different from a failure. See [How a request works](/guides/request-lifecycle/).
-:::
+The result is read separately: by polling, over a WebSocket, or through an MCP tool that waits. See [Waiting for results](/guides/waiting/).
 
-## What you need
+`ready` does not always mean data was found: the result's `data-found` can be `false`, with a `reason`. See [How a request works](/guides/request-lifecycle/#outcomes).
 
-- **For the API:** an account and an [API key](/getting-started/api-keys/). The [Free plan](/getting-started/plans/) is enough to start.
-- **For an AI agent:** the MCP server's URL, `https://mcp.onion4.ai/mcp`. Without a key the agent gets the anonymous tier; with one it gets your plan.
+## Next
 
-## Next steps
-
-- [Quickstart: HTTP API](/getting-started/quickstart/) — your first request with cURL, Python or JavaScript.
-- [Quickstart: AI agents](/getting-started/agents/) — connect Claude or Cursor in a minute.
-- [Writing instructions](/guides/instructions/) — how to ask for exactly the data you need.
+- [Quickstart: HTTP API](/getting-started/quickstart/)
+- [Quickstart: AI agents](/getting-started/agents/)
+- [Writing instructions](/guides/instructions/)

@@ -540,14 +540,6 @@ button.sl-menu-button:has(~ :popover-open) {
 	background: var(--brand-deep);
 	border-color: var(--border-brand);
 }
-#starlight__sidebar a.dashboard,
-#starlight__sidebar a.dashboard:hover {
-	color: var(--bg-page);
-	background: var(--fg-primary);
-	font: var(--font-label-lg);
-	padding: 7px 14px;
-	border-radius: 10px;
-}
 #starlight__sidebar .mobile-topics a {
 	border: 1px solid var(--border-default);
 	border-radius: 10px;

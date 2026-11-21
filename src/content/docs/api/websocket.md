@@ -1,44 +1,41 @@
 ---
 title: Live status
-description: A WebSocket that sends a request's state on connect and every change after it.
+description: WebSocket with the request's state on connect and on every change.
 ---
 
 <span class="method ws">WS</span> <span class="endpoint">wss://user.onion4.ai/api/v1/ws?request-id={id}</span>
 
-Instead of polling, open a socket for a request: it sends the current state as soon as you connect, then every change — `processing`, then `ready` or `failed`.
-
 | | |
 |---|---|
-| Query | `request-id` — the request's id. |
-| Auth | `Authorization: Bearer onion_sk_…` — **header only**. A key in a query string would end up in access logs. |
-| Plan | Live updates are included from **Basic** up. |
+| Query | `request-id` — the request's UUID. |
+| Auth | `Authorization: Bearer onion_sk_…` in the handshake headers. Not accepted in the query string. |
+| Plan | Basic and up (`live_updates`). |
 
 ## Messages
 
-Each message is the document [`GET /parse-requests/{id}`](/api/parse-requests/#status) returns. When the status is `ready`, two things ride along, so no further call is needed:
+The first message is the current state, then one message per status change:
 
-- `included[0]` — the `parse-results` resource, the same one [`/result`](/api/parse-requests/#result) returns, with its `download-url`;
-- `meta.artifacts` — the same list [`/artifacts`](/api/parse-requests/#artifacts) returns.
-
-```json title="The last message"
-{ "data": { "type": "parse-requests", "id": "6f1c…", "attributes": { "status": "ready", … } },
+```json title="status ready"
+{ "meta": { "event": "result", "artifacts": [ … ] },
+  "data": { "type": "parse-requests", "id": "6f1c…", "attributes": { "status": "ready", … } },
   "included": [ { "type": "parse-results", "id": "…",
-                  "attributes": { "data-found": true, "download-url": "https://…", … } } ],
-  "meta": { "artifacts": [ … ] } }
+                  "attributes": { "data-found": true, "download-url": "https://…", … } } ] }
 ```
 
-After the final state the server keeps the socket open until you close it. Connecting to a request that has already finished is fine: the first message is its final state.
+- `meta.event`: `status` (queued, processing), `result` (ready), `error` (failed).
+- `data`: the request resource, as in [`GET /parse-requests/{id}`](/api/parse-requests/#status).
+- On `ready`: `included[0]` — the result as in [`/result`](/api/parse-requests/#result); `meta.artifacts` — the list from [`/artifacts`](/api/parse-requests/#artifacts).
+
+After the final state the server closes the socket (code `1000`, reason `terminal`) if the client has not closed it within 10 seconds. Connecting to a finished request returns its final state.
 
 ## Refusals
 
-The handshake answers with a plain HTTP status instead of upgrading:
+The handshake is answered with a plain-text HTTP error instead of an upgrade:
 
-| Status | Why |
+| Status | Cause |
 |---|---|
 | `400` | `request-id` is not a UUID. |
-| `401` | The key was sent and does not resolve. |
-| `403` | The request is not yours — or your plan does not include live updates. |
+| `401` | The key is unknown, revoked or expired. |
+| `403` | The request is not yours; the plan has no live updates; the `Origin` is not allowed. |
 
-In every case the fallback is the same: [poll](/guides/waiting/) `GET /parse-requests/{id}`.
-
-A Node.js example is in [Waiting for results](/guides/waiting/#websocket).
+Only a header with the full `onion_sk_` prefix is checked as a key; anything else is treated as no key, and a request owned by an account then answers `403`. Fallback for every refusal: [polling](/guides/waiting/).

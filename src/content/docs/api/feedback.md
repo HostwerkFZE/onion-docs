@@ -1,6 +1,6 @@
 ---
 title: Feedback
-description: Judge an answer — the one signal only the caller can produce.
+description: POST /feedback — a verdict on a result.
 ---
 
 <span class="method post">POST</span> <span class="endpoint">/feedback</span>
@@ -9,20 +9,19 @@ description: Judge an answer — the one signal only the caller can produce.
 { "data": { "type": "feedback", "attributes": {
   "request-id": "6f1c…",
   "verdict": "wrong",
-  "detail": "the price is last month's; the page shows 129.99 today"
+  "detail": "price shown on the page is 129.99, the result says 119.99"
 } } }
 ```
 
 | Attribute | Type | |
 |---|---|---|
-| `verdict` | `helpful` \| `incomplete` \| `wrong` \| `unusable`, required | How the answer turned out. |
-| `request-id` | uuid | The request this is about. Leave it out for feedback about the service in general. |
-| `detail` | string, up to 4,096 | What was wrong, and what you expected. Required unless the verdict is `helpful`. |
+| `verdict` | `helpful` \| `incomplete` \| `wrong` \| `unusable` | Required. |
+| `request-id` | UUID | Optional; without it the feedback is about the service. |
+| `detail` | string, up to 4096 bytes | Required unless `verdict` is `helpful`. |
 
-**Answers**
+**Responses:**
 
-- `201 Created` — the feedback, with its `id`, `verdict` and `source` (`api`, taken from your credential).
-- `404 not_found` — the request is not yours. Whoever may read a request may judge it, and nobody else.
-- `422 validation_error` — an unknown verdict, or a verdict other than `helpful` without `detail`.
-
-Why it matters and how to write a useful `detail`: [Sending feedback](/guides/feedback/).
+- `201` — `feedback` resource with `id`, `verdict`, `source`.
+- `400 malformed` — the body is not valid JSON.
+- `404 not_found` — the request is not yours.
+- `422 validation_error` — unknown verdict, missing or too long `detail`, `request-id` not a UUID.

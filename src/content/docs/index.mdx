@@ -1,12 +1,12 @@
 ---
 title: Documentation
-description: Onion turns a URL and a plain-language instruction into structured data. Guides, the HTTP API and the MCP server.
+description: Onion extracts data from webpages by a URL and a plain-language instruction. Guides, HTTP API, MCP server.
 template: splash
 editUrl: false
 lastUpdated: false
 hero:
   title: Structured data from any webpage
-  tagline: Give Onion a URL and say what you need in plain language. The data comes back structured — to your code over the HTTP API, or to your AI agent over MCP.
+  tagline: Send a URL and an instruction in plain language, get the extracted data back — over the HTTP API or through the MCP server.
   actions:
     - text: Quickstart
       link: /getting-started/quickstart/
@@ -19,7 +19,6 @@ hero:
 import TopicCard from '../../components/TopicCard.astro';
 
 <div class="home-section">
-<h2 class="home-h2">Choose your path</h2>
 <div class="home-grid">
 <TopicCard
 	icon="rocket"
@@ -32,7 +31,7 @@ import TopicCard from '../../components/TopicCard.astro';
 		{ label: 'Plans and limits', href: '/getting-started/plans/' },
 	]}
 >
-	What Onion does, your first request in a couple of minutes, and what each plan allows.
+	Access, keys, the first request, plan limits.
 </TopicCard>
 <TopicCard
 	icon="open-book"
@@ -45,7 +44,7 @@ import TopicCard from '../../components/TopicCard.astro';
 		{ label: 'Rate limits and concurrency', href: '/guides/rate-limits/' },
 	]}
 >
-	How requests move from queued to ready, how to ask for the data you need, and how to build a client that holds up.
+	Statuses, instructions, results, crawl options, retries, limits, errors.
 </TopicCard>
 <TopicCard
 	icon="puzzle"
@@ -57,7 +56,7 @@ import TopicCard from '../../components/TopicCard.astro';
 		{ label: 'Tools', href: '/mcp/tools/' },
 	]}
 >
-	Give Claude, Cursor or any MCP client the whole web: one URL, one key, seven tools.
+	Onion as MCP tools for Claude, Cursor and other clients.
 </TopicCard>
 <TopicCard
 	icon="seti:json"
@@ -70,36 +69,32 @@ import TopicCard from '../../components/TopicCard.astro';
 		{ label: 'OpenAPI (Swagger UI)', href: 'https://user.onion4.ai/api/v1/docs' },
 	]}
 >
-	Every endpoint a key can call: JSON:API over HTTPS, with a machine-readable OpenAPI spec.
+	Endpoints, parameters, responses and error codes.
 </TopicCard>
 </div>
 </div>
 
 <div class="home-section">
-<h2 class="home-h2">Works where your agent lives</h2>
+<h2 class="home-h2">MCP clients</h2>
 <div class="home-clients">
-<a href="mcp/clients/#claude-desktop">Claude Desktop</a>
 <a href="mcp/clients/#claude-code">Claude Code</a>
+<a href="mcp/clients/#claude-desktop">Claude Desktop</a>
 <a href="mcp/clients/#cursor">Cursor</a>
-<a href="mcp/clients/#any-other-client">Any MCP client</a>
+<a href="mcp/clients/#other-clients">Other clients</a>
 </div>
 </div>
 
 <div class="home-section home-resources">
-<a href="https://user.onion4.ai/">
-<strong>Dashboard</strong>
-<span>Keys, request history, activity and billing.</span>
-</a>
 <a href="https://onion4.ai/">
 <strong>Playground</strong>
-<span>Try a request in the browser, no account needed.</span>
+<span>A request in the browser, without an account.</span>
 </a>
 <a href="https://user.onion4.ai/api/v1/docs">
 <strong>OpenAPI</strong>
-<span>The spec the API is tested against, in Swagger UI.</span>
+<span>The API specification in Swagger UI.</span>
 </a>
 <a href="https://onion4.ai/support">
 <strong>Support</strong>
-<span>Something wrong, or missing? Tell us.</span>
+<span>Questions and bug reports.</span>
 </a>
 </div>
