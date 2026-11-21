@@ -1,0 +1,195 @@
+---
+import { Image } from 'astro:assets';
+import particles from '../assets/particles.png';
+import { withBase } from './topics';
+
+// The home page's hero: the frontmatter's title, tagline and actions over the
+// landing's particle cloud, with the first request beside them.
+const { data } = Astro.locals.starlightRoute.entry;
+const { title = data.title, tagline, actions = [] } = data.hero || {};
+const href = (link: string) => (link.startsWith('/') ? withBase(link.slice(1)) : link);
+---
+
+<div class="hero not-content">
+	<div class="glow" aria-hidden="true"></div>
+	<Image class="cloud" src={particles} alt="" width={900} loading="eager" fetchpriority="high" />
+	<div class="copy">
+		<p class="eyebrow">Onion documentation</p>
+		<h1 id="_top" data-page-title set:html={title} />
+		{tagline && <p class="tagline" set:html={tagline} />}
+		<div class="actions">
+			{
+				actions.map(({ link, text, variant }) => (
+					<a class:list={['action', variant === 'primary' ? 'primary' : 'secondary']} href={href(link)}>
+						{text}
+						<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+							<path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+					</a>
+				))
+			}
+		</div>
+	</div>
+	<div class="terminal" aria-label="An example request">
+		<div class="bar"><span></span><span></span><span></span><em>Your first request</em></div>
+		<pre><code><span class="c"># a URL and what you want from it</span>
+<span class="k">curl</span> -X POST https://user.onion4.ai/api/v1/parse-requests \
+  -H <span class="s">"Authorization: Bearer $ONION_KEY"</span> \
+  -H <span class="s">"Content-Type: application/vnd.api+json"</span> \
+  -d <span class="s">'&#123;"data":&#123;"type":"parse-requests","attributes":&#123;
+    "input":"https://onion4.ai/products extract product names, prices and availability, return the result in json"&#125;&#125;&#125;'</span>
+
+<span class="c"># → 201 &#123; "data": &#123; "id": "…", "attributes": &#123; "status": "queued" &#125; &#125; &#125;</span></code></pre>
+	</div>
+</div>
+
+<style>
+	.hero {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 2.5rem;
+		align-items: center;
+		padding: 3.5rem 0 2.5rem;
+		isolation: isolate;
+	}
+	@media (min-width: 64rem) {
+		.hero {
+			grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+			padding: 5rem 0 3.5rem;
+		}
+	}
+	.glow {
+		position: absolute;
+		inset: -20% -10% auto auto;
+		width: 70%;
+		height: 120%;
+		background: radial-gradient(closest-side, rgb(140 106 222 / 0.22), transparent 70%);
+		z-index: -2;
+		pointer-events: none;
+	}
+	.cloud {
+		position: absolute;
+		right: -6%;
+		top: -12%;
+		width: min(820px, 90%);
+		height: auto;
+		opacity: 0.55;
+		mix-blend-mode: screen;
+		z-index: -1;
+		pointer-events: none;
+		mask-image: radial-gradient(closest-side, #000 55%, transparent);
+		-webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
+	}
+	.eyebrow {
+		display: inline-flex;
+		font: var(--font-label-sm);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		font-size: 11px;
+		color: var(--brand-medium);
+		background: var(--brand-deep);
+		border: 1px solid var(--border-brand);
+		border-radius: 999px;
+		padding: 5px 11px;
+		margin: 0 0 1.25rem;
+	}
+	h1 {
+		font: 600 clamp(34px, 5vw, 52px) / 1.1 var(--ff-sans);
+		letter-spacing: -0.045em;
+		color: var(--fg-primary);
+		margin: 0;
+		max-width: 14ch;
+	}
+	.tagline {
+		font: 500 17px/1.6 var(--ff-sans);
+		letter-spacing: -0.01em;
+		color: var(--fg-tertiary);
+		margin: 1.25rem 0 0;
+		max-width: 34rem;
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 2rem;
+	}
+	.action {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font: var(--font-label-lg);
+		letter-spacing: var(--tracking-label-lg);
+		padding: 11px 18px;
+		border-radius: 12px;
+		text-decoration: none;
+		transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+	}
+	.action svg {
+		transition: transform 140ms ease;
+	}
+	.action:hover svg {
+		transform: translateX(2px);
+	}
+	.primary {
+		background: var(--fg-primary);
+		color: var(--bg-page);
+	}
+	.primary:hover {
+		background: var(--brand-medium);
+	}
+	.secondary {
+		background: var(--bg-surface-2);
+		border: 1px solid var(--border-secondary);
+		color: var(--fg-primary);
+	}
+	.secondary:hover {
+		border-color: var(--border-brand);
+		background: var(--brand-deep);
+	}
+	.terminal {
+		background: rgb(14 14 15 / 0.86);
+		backdrop-filter: blur(6px);
+		border: 1px solid var(--border-default);
+		border-radius: 16px;
+		overflow: hidden;
+		box-shadow: 0 30px 80px -30px rgb(140 106 222 / 0.35);
+	}
+	.bar {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 12px 14px;
+		border-bottom: 1px solid var(--border-default);
+		background: var(--bg-surface-2);
+	}
+	.bar span {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--border-secondary);
+	}
+	.bar em {
+		margin-left: 8px;
+		font: var(--font-body-xs);
+		font-style: normal;
+		color: var(--fg-subtle);
+	}
+	pre {
+		margin: 0;
+		padding: 18px 20px;
+		overflow-x: auto;
+		font: 300 12px/22px var(--ff-mono);
+		color: var(--fg-secondary);
+		background: transparent;
+	}
+	.c {
+		color: var(--fg-subtle);
+	}
+	.k {
+		color: var(--code-function);
+	}
+	.s {
+		color: var(--code-string);
+	}
+</style>

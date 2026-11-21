@@ -1,0 +1,89 @@
+---
+title: 'Quickstart: AI agents'
+description: Connect Claude, Cursor or any MCP client to Onion, and ask it for data from the web.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Onion's MCP server gives an AI agent the same ability the API gives your code: a URL plus an instruction in, structured data out. The agent decides when to call it; you just ask.
+
+<Steps>
+
+1. **Get a key (optional).**
+
+   Without a key the agent works anonymously, with the limits of the public playground. With a key it works under your plan and its requests appear in your request history. Create one in the [dashboard](https://user.onion4.ai/) under **API keys**.
+
+2. **Add Onion to your client.**
+
+   The server lives at `https://mcp.onion4.ai/mcp` and speaks Streamable HTTP.
+
+   <Tabs syncKey="mcp-client">
+   <TabItem label="Claude Code">
+
+   Run this in your project, then start `claude`:
+
+   ```sh
+   claude mcp add --transport http onion https://mcp.onion4.ai/mcp \
+     --header "Authorization: Bearer <YOUR_KEY>"
+   ```
+
+   </TabItem>
+   <TabItem label="Claude Desktop">
+
+   Open **Settings → Developer → Edit Config**, add the server, save the file and restart Claude:
+
+   ```json title="claude_desktop_config.json"
+   {
+     "mcpServers": {
+       "onion": {
+         "type": "http",
+         "url": "https://mcp.onion4.ai/mcp",
+         "headers": {
+           "Authorization": "Bearer <YOUR_KEY>"
+         }
+       }
+     }
+   }
+   ```
+
+   </TabItem>
+   <TabItem label="Cursor">
+
+   Open **Settings → MCP → Add new global MCP server**, paste and save:
+
+   ```json title="mcp.json"
+   {
+     "mcpServers": {
+       "onion": {
+         "url": "https://mcp.onion4.ai/mcp",
+         "headers": {
+           "Authorization": "Bearer <YOUR_KEY>"
+         }
+       }
+     }
+   }
+   ```
+
+   </TabItem>
+   </Tabs>
+
+   Going without a key? Leave out the `Authorization` header. Other clients: [Connect a client](/mcp/clients/).
+
+3. **Ask for something.**
+
+   ```text
+   Use Onion to extract the product name, price and availability from this page: https://onion4.ai/products
+   ```
+
+   The agent calls `extract_and_wait`, or `extract` and then polls, and answers from the result.
+
+</Steps>
+
+<Aside type="tip" title="Tell it when it got it wrong">
+The `feedback` tool lets the agent report that an answer was stale, incomplete or wrong. That signal only the caller can produce, and it is how extraction gets better. See [Sending feedback](/guides/feedback/).
+</Aside>
+
+## Next steps
+
+- [MCP overview](/mcp/overview/) — anonymous and keyed use, and how the server handles your key.
+- [Tools](/mcp/tools/) — every tool, its parameters and its answers.

@@ -1,0 +1,104 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+import { withBase } from './topics';
+
+// A card on the home page: a topic, what it is for, and its main pages.
+interface Props {
+	icon: string;
+	title: string;
+	href: string;
+	links?: { label: string; href: string }[];
+}
+const { icon, title, href, links = [] } = Astro.props;
+const to = (h: string) => (h.startsWith('/') ? withBase(h.slice(1)) : h);
+---
+
+<div class="topic-card not-content">
+	<a class="head" href={to(href)}>
+		<span class="icon"><Icon name={icon as any} size="1.25rem" /></span>
+		<span class="title">{title}</span>
+	</a>
+	<p class="desc"><slot /></p>
+	{
+		links.length > 0 && (
+			<ul>
+				{links.map((l) => (
+					<li>
+						<a href={to(l.href)}>{l.label}</a>
+					</li>
+				))}
+			</ul>
+		)
+	}
+</div>
+
+<style>
+	.topic-card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1.25rem 1.25rem 1.1rem;
+		background: var(--bg-surface-1);
+		border: 1px solid var(--border-default);
+		border-radius: 16px;
+		transition: border-color 140ms ease, background 140ms ease;
+	}
+	.topic-card:hover {
+		border-color: var(--border-brand);
+		background: linear-gradient(180deg, rgb(51 45 58 / 0.45), var(--bg-surface-1) 60%);
+	}
+	.head {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		text-decoration: none;
+	}
+	.icon {
+		display: grid;
+		place-items: center;
+		width: 36px;
+		height: 36px;
+		border-radius: 10px;
+		color: var(--brand-medium);
+		background: var(--brand-deep);
+		border: 1px solid var(--border-brand);
+	}
+	.title {
+		font: var(--font-heading-3);
+		letter-spacing: var(--tracking-heading-3);
+		color: var(--fg-primary);
+	}
+	.desc {
+		margin: 0;
+		font: 500 14px/1.6 var(--ff-sans);
+		letter-spacing: -0.01em;
+		color: var(--fg-subtle);
+	}
+	ul {
+		list-style: none;
+		margin: 0.25rem 0 0;
+		padding: 0.75rem 0 0;
+		border-top: 1px solid var(--border-default);
+		display: grid;
+		gap: 0.35rem;
+	}
+	li a {
+		font: var(--font-body-md);
+		letter-spacing: var(--tracking-body-md);
+		color: var(--fg-tertiary);
+		text-decoration: none;
+		display: inline-flex;
+		gap: 0.4rem;
+		align-items: center;
+	}
+	li a::before {
+		content: '';
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
+		background: var(--brand-accent);
+	}
+	li a:hover {
+		color: var(--fg-primary);
+	}
+</style>

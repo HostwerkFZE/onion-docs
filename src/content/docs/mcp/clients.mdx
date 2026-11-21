@@ -1,0 +1,100 @@
+---
+title: Connect a client
+description: Add Onion to Claude Desktop, Claude Code, Cursor or any other MCP client.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Every client needs the same two things: the server URL and, optionally, your key.
+
+| | |
+|---|---|
+| URL | `https://mcp.onion4.ai/mcp` |
+| Transport | Streamable HTTP |
+| Header | `Authorization: Bearer <YOUR_KEY>` — leave it out to work anonymously |
+
+Create a key in the [dashboard](https://user.onion4.ai/) under **API keys**. The dashboard's **Connect** page has the same snippets with your server URL filled in.
+
+## Claude Code
+
+Run in your project, then start `claude`:
+
+```sh
+claude mcp add --transport http onion https://mcp.onion4.ai/mcp \
+  --header "Authorization: Bearer <YOUR_KEY>"
+```
+
+Check it with `/mcp` inside Claude Code: `onion` should be listed as connected.
+
+## Claude Desktop
+
+<Steps>
+
+1. Open **Claude Desktop → Settings → Developer**.
+2. Select **Edit Config**.
+3. Add the server, save the file and restart Claude.
+
+   ```json title="claude_desktop_config.json"
+   {
+     "mcpServers": {
+       "onion": {
+         "type": "http",
+         "url": "https://mcp.onion4.ai/mcp",
+         "headers": {
+           "Authorization": "Bearer <YOUR_KEY>"
+         }
+       }
+     }
+   }
+   ```
+
+</Steps>
+
+## Cursor
+
+<Steps>
+
+1. Open **Cursor → Settings → MCP**.
+2. Select **Add new global MCP server**.
+3. Paste the configuration and save the file.
+
+   ```json title="mcp.json"
+   {
+     "mcpServers": {
+       "onion": {
+         "url": "https://mcp.onion4.ai/mcp",
+         "headers": {
+           "Authorization": "Bearer <YOUR_KEY>"
+         }
+       }
+     }
+   }
+   ```
+
+</Steps>
+
+## Any other client
+
+Any MCP client that speaks Streamable HTTP connects with the URL and the header above. To check the URL, the key and TLS from a terminal, send the protocol's opening call — the server answers with its name:
+
+```sh
+curl -sS -X POST https://mcp.onion4.ai/mcp \
+  -H "Authorization: Bearer <YOUR_KEY>" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{
+        "protocolVersion":"2025-06-18","capabilities":{},
+        "clientInfo":{"name":"curl","version":"0"}}}'
+```
+
+<Aside type="note">
+The server is stateless: it issues no `Mcp-Session-Id`, and `GET` or `DELETE` on `/mcp` answer `405`. Every `POST` stands on its own, with the key it carries.
+</Aside>
+
+## Try it
+
+Ask your agent:
+
+```text
+Use Onion to extract the product name, price and availability from this page: https://onion4.ai/products
+```

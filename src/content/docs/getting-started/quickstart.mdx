@@ -1,0 +1,172 @@
+---
+title: 'Quickstart: HTTP API'
+description: Submit a URL and an instruction, wait for it, and download the data — with cURL, Python or JavaScript.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+This page takes you from nothing to structured data in three calls: submit, wait, download.
+
+<Steps>
+
+1. **Create an API key.**
+
+   Sign in to the [dashboard](https://user.onion4.ai/), open **API keys** and create one. The key — `onion_sk_…` — is shown in full right there; keep it in an environment variable rather than in your code:
+
+   ```sh
+   export ONION_API_KEY=onion_sk_...
+   ```
+
+   More on keys: [API keys](/getting-started/api-keys/).
+
+2. **Submit a request.**
+
+   `input` carries exactly one URL and the instruction that goes with it. The answer is `201 Created` with the request's `id` and the status `queued`. (On the Free plan you may start one request a minute; a second one inside the minute is answered `429` with a `Retry-After`.)
+
+   <Tabs syncKey="lang">
+   <TabItem label="cURL">
+
+   ```sh
+   curl -sS -X POST https://user.onion4.ai/api/v1/parse-requests \
+     -H "Authorization: Bearer $ONION_API_KEY" \
+     -H "Content-Type: application/vnd.api+json" \
+     -d '{"data":{"type":"parse-requests","attributes":{
+           "input":"https://onion4.ai/products extract product names, prices and availability, return the result in json"}}}'
+   ```
+
+   </TabItem>
+   <TabItem label="Python">
+
+   ```python
+   import os, requests
+
+   API = "https://user.onion4.ai/api/v1"
+   HEADERS = {
+       "Authorization": f"Bearer {os.environ['ONION_API_KEY']}",
+       "Content-Type": "application/vnd.api+json",
+   }
+
+   r = requests.post(f"{API}/parse-requests", headers=HEADERS, json={
+       "data": {"type": "parse-requests", "attributes": {
+           "input": "https://onion4.ai/products extract product names, prices and availability, return the result in json",
+       }},
+   })
+   r.raise_for_status()
+   request_id = r.json()["data"]["id"]
+   ```
+
+   </TabItem>
+   <TabItem label="JavaScript">
+
+   ```js
+   const API = "https://user.onion4.ai/api/v1";
+   const headers = {
+     Authorization: `Bearer ${process.env.ONION_API_KEY}`,
+     "Content-Type": "application/vnd.api+json",
+   };
+
+   const res = await fetch(`${API}/parse-requests`, {
+     method: "POST",
+     headers,
+     body: JSON.stringify({ data: { type: "parse-requests", attributes: {
+       input: "https://onion4.ai/products extract product names, prices and availability, return the result in json",
+     } } }),
+   });
+   if (!res.ok) throw new Error(await res.text());
+   const requestId = (await res.json()).data.id;
+   ```
+
+   </TabItem>
+   </Tabs>
+
+   ```json title="201 Created"
+   { "data": { "type": "parse-requests", "id": "6f1c…",
+       "attributes": { "status": "queued", "source": "api", "mode": "fast", … } } }
+   ```
+
+3. **Wait for the result.**
+
+   Ask for the result. Until the request settles the answer is `{"data": null, "meta": {"status": "processing"}}`; once it is `ready`, `data` is the result. Reads are free — they never count against your rate limit.
+
+   <Tabs syncKey="lang">
+   <TabItem label="cURL">
+
+   ```sh
+   curl -sS https://user.onion4.ai/api/v1/parse-requests/<REQUEST_ID>/result \
+     -H "Authorization: Bearer $ONION_API_KEY"
+   ```
+
+   </TabItem>
+   <TabItem label="Python">
+
+   ```python
+   import time
+
+   while True:
+       body = requests.get(f"{API}/parse-requests/{request_id}/result", headers=HEADERS).json()
+       if body["data"] is not None:
+           result = body["data"]["attributes"]
+           break
+       if body["meta"]["status"] == "failed":
+           raise SystemExit(body["meta"].get("error"))
+       time.sleep(2)
+   ```
+
+   </TabItem>
+   <TabItem label="JavaScript">
+
+   ```js
+   let result;
+   for (;;) {
+     const body = await (await fetch(`${API}/parse-requests/${requestId}/result`, { headers })).json();
+     if (body.data) { result = body.data.attributes; break; }
+     if (body.meta.status === "failed") throw new Error(body.meta.error);
+     await new Promise((r) => setTimeout(r, 2000));
+   }
+   ```
+
+   </TabItem>
+   </Tabs>
+
+4. **Download the data.**
+
+   The result carries what the crawl found out — `data-found`, `http-status`, `final-url` and more — and a short-lived, presigned `download-url` for the data itself. Fetch it without the `Authorization` header: the signature is the permission.
+
+   <Tabs syncKey="lang">
+   <TabItem label="cURL">
+
+   ```sh
+   curl -sS "<download-url>"
+   ```
+
+   </TabItem>
+   <TabItem label="Python">
+
+   ```python
+   print(result["data-found"], result.get("reason"))
+   print(requests.get(result["download-url"]).text)
+   ```
+
+   </TabItem>
+   <TabItem label="JavaScript">
+
+   ```js
+   console.log(result["data-found"], result.reason);
+   console.log(await (await fetch(result["download-url"])).text());
+   ```
+
+   </TabItem>
+   </Tabs>
+
+</Steps>
+
+<Aside type="tip" title="Polling is the simplest way, not the only one">
+A WebSocket pushes every status change to you the moment it happens, and the status read supports `ETag`, so an unchanged answer costs a `304`. See [Waiting for results](/guides/waiting/).
+</Aside>
+
+## What to read next
+
+- [Writing instructions](/guides/instructions/) — how to phrase `input` so the answer is what you need.
+- [Results and formats](/guides/results/) — `output-format`, `result-schema` and what every result field means.
+- [Safe retries](/guides/retries/) — `Idempotency-Key`, so a lost connection never runs the same work twice.
+- [Rate limits and concurrency](/guides/rate-limits/) — what your plan allows, and the headers that say where you stand.

@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="123" height="28" viewBox="6.64 16.4 492 112" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M217.902 42.4C234.475 42.4 247.91 55.8315 247.91 72.4C247.91 88.9686 234.475 102.4 217.902 102.4C201.33 102.4 187.895 88.9686 187.895 72.4C187.895 55.8315 201.33 42.4 217.902 42.4ZM217.902 56.4323C209.081 56.4323 201.931 63.5813 201.931 72.4C201.931 81.2188 209.081 88.3678 217.902 88.3678C226.723 88.3678 233.874 81.2188 233.874 72.4C233.874 63.5813 226.723 56.4323 217.902 56.4323Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M384.499 42.4C401.071 42.4 414.506 55.8315 414.506 72.4C414.506 88.9686 401.071 102.4 384.499 102.4C367.926 102.4 354.491 88.9686 354.491 72.4C354.491 55.8315 367.926 42.4 384.499 42.4ZM384.499 56.4323C375.678 56.4323 368.527 63.5813 368.527 72.4C368.527 81.2188 375.678 88.3678 384.499 88.3678C393.32 88.3678 400.47 81.2188 400.47 72.4C400.47 63.5813 393.32 56.4323 384.499 56.4323Z" fill="white"/>
+<path d="M314.28 46.0291C318.156 46.0291 321.298 49.1703 321.298 53.0452V91.7549C321.298 94.4219 319.786 96.8584 317.395 98.0421C315.005 99.2258 312.149 98.952 310.027 97.3357L270.479 67.2112V91.7549C270.479 95.6298 267.337 98.771 263.461 98.771C259.586 98.771 256.444 95.6298 256.444 91.7549V53.0452C256.444 50.3781 257.956 47.9417 260.347 46.7579C262.737 45.5742 265.593 45.848 267.715 47.4644L307.263 77.5886V53.0452C307.263 49.1703 310.405 46.0291 314.28 46.0291Z" fill="white"/>
+<path d="M338.42 46.0291C342.296 46.0291 345.438 49.1703 345.438 53.0452V91.7549C345.438 95.6298 342.296 98.771 338.42 98.771C334.544 98.771 331.402 95.6298 331.402 91.7549V53.0452C331.402 49.1703 334.544 46.0291 338.42 46.0291Z" fill="white"/>
+<path d="M480.877 46.0291C484.753 46.0291 487.895 49.1703 487.895 53.0452V91.7549C487.895 94.4219 486.382 96.8584 483.992 98.0421C481.601 99.2258 478.746 98.952 476.624 97.3357L437.076 67.2112V91.7549C437.076 95.6298 433.934 98.771 430.058 98.771C426.182 98.771 423.04 95.6298 423.04 91.7549V53.0452C423.04 50.3781 424.552 47.9417 426.943 46.7579C429.334 45.5742 432.189 45.848 434.311 47.4644L473.859 77.5886V53.0452C473.859 49.1703 477.001 46.0291 480.877 46.0291Z" fill="white"/>
+<g opacity="0.6" filter="url(#brand-onion-logo-filter0_f_49_480)">
+<path d="M58.0464 115.8C75.5243 115.8 89.6928 95.7872 89.6928 71.1C89.6928 46.4129 75.5243 26.4 58.0464 26.4C40.5686 26.4 26.4 46.4129 26.4 71.1C26.4 95.7872 40.5686 115.8 58.0464 115.8Z" fill="#6F00FF"/>
+</g>
+<g opacity="0.72" filter="url(#brand-onion-logo-filter1_f_49_480)">
+<path d="M56.9929 113.4C74.8869 113.4 89.3929 94.596 89.3929 71.4C89.3929 48.2041 74.8869 29.4 56.9929 29.4C39.0989 29.4 24.5929 48.2041 24.5929 71.4C24.5929 94.596 39.0989 113.4 56.9929 113.4Z" fill="#8A00FF"/>
+</g>
+<g opacity="0.95" filter="url(#brand-onion-logo-filter2_f_49_480)">
+<path d="M59.3929 108.539C75.6301 108.539 88.7929 91.9425 88.7929 71.4696C88.7929 50.9966 75.6301 34.4 59.3929 34.4C43.1557 34.4 29.9929 50.9966 29.9929 71.4696C29.9929 91.9425 43.1557 108.539 59.3929 108.539Z" fill="#FF7A00"/>
+</g>
+<g filter="url(#brand-onion-logo-filter3_f_49_480)">
+<path d="M60.5928 44.3998L59.3928 45.5998H56.9928L53.3928 49.1998H52.1928V50.3998L49.7928 51.5998L48.5928 55.1998L46.1928 57.5998L44.9928 59.9998V63.5998L43.7928 64.7998V76.7998L44.9928 77.9998V81.5998L46.1928 83.9998L48.5928 86.3998L49.7928 89.9998H50.9928L53.3928 92.3998V93.5998L60.5928 97.1997H72.5928L74.9928 94.7998H76.1928L82.1928 88.7998V87.5998L84.5928 85.1998L85.7928 82.7998V79.1998L88.1928 74.3998V65.9998L86.9928 64.7998L85.7928 58.7998L79.7928 49.1998H78.5928L74.9928 45.5998H72.5928L71.3928 44.3998H60.5928Z" fill="url(#brand-onion-logo-paint0_linear_49_480)"/>
+</g>
+<g opacity="0.6" filter="url(#brand-onion-logo-filter4_f_49_480)">
+<path d="M125.839 115.8C108.361 115.8 94.1929 95.7872 94.1929 71.1C94.1929 46.4129 108.361 26.4 125.839 26.4C143.317 26.4 157.486 46.4129 157.486 71.1C157.486 95.7872 143.317 115.8 125.839 115.8Z" fill="#6F00FF"/>
+</g>
+<g opacity="0.72" filter="url(#brand-onion-logo-filter5_f_49_480)">
+<path d="M126.893 113.4C108.999 113.4 94.4928 94.596 94.4928 71.4C94.4928 48.2041 108.999 29.4 126.893 29.4C144.787 29.4 159.293 48.2041 159.293 71.4C159.293 94.596 144.787 113.4 126.893 113.4Z" fill="#8A00FF"/>
+</g>
+<g opacity="0.95" filter="url(#brand-onion-logo-filter6_f_49_480)">
+<path d="M124.493 108.539C108.256 108.539 95.0928 91.9425 95.0928 71.4696C95.0928 50.9966 108.256 34.4 124.493 34.4C140.73 34.4 153.893 50.9966 153.893 71.4696C153.893 91.9425 140.73 108.539 124.493 108.539Z" fill="#FF7A00"/>
+</g>
+<g filter="url(#brand-onion-logo-filter7_f_49_480)">
+<path d="M123.293 44.3998L124.493 45.5998H126.893L130.493 49.1998H131.693V50.3998L134.093 51.5998L135.293 55.1998L137.693 57.5998L138.893 59.9998V63.5998L140.093 64.7998V76.7998L138.893 77.9998V81.5998L137.693 83.9998L135.293 86.3998L134.093 89.9998H132.893L130.493 92.3998V93.5998L123.293 97.1997H111.293L108.893 94.7998H107.693L101.693 88.7998V87.5998L99.2929 85.1998L98.0929 82.7998V79.1998L95.6929 74.3998V65.9998L96.8929 64.7998L98.0929 58.7998L104.093 49.1998H105.293L108.893 45.5998H111.293L112.493 44.3998H123.293Z" fill="url(#brand-onion-logo-paint1_linear_49_480)"/>
+</g>
+<defs>
+<filter id="brand-onion-logo-filter0_f_49_480" x="2.28882e-05" y="2.28882e-05" width="116.093" height="142.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="13.2" result="effect1_foregroundBlur_49_480"/>
+</filter>
+<filter id="brand-onion-logo-filter1_f_49_480" x="5.39289" y="10.2" width="103.2" height="122.4" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="9.6" result="effect1_foregroundBlur_49_480"/>
+</filter>
+<filter id="brand-onion-logo-filter2_f_49_480" x="20.3929" y="24.8" width="78" height="93.3392" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="4.8" result="effect1_foregroundBlur_49_480"/>
+</filter>
+<filter id="brand-onion-logo-filter3_f_49_480" x="37.7928" y="38.3998" width="56.4" height="64.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="3" result="effect1_foregroundBlur_49_480"/>
+</filter>
+<filter id="brand-onion-logo-filter4_f_49_480" x="67.7929" y="2.28882e-05" width="116.093" height="142.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="13.2" result="effect1_foregroundBlur_49_480"/>
+</filter>
+<filter id="brand-onion-logo-filter5_f_49_480" x="75.2928" y="10.2" width="103.2" height="122.4" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="9.6" result="effect1_foregroundBlur_49_480"/>
+</filter>
+<filter id="brand-onion-logo-filter6_f_49_480" x="85.4928" y="24.8" width="78" height="93.3392" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="4.8" result="effect1_foregroundBlur_49_480"/>
+</filter>
+<filter id="brand-onion-logo-filter7_f_49_480" x="89.6929" y="38.3998" width="56.4" height="64.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="3" result="effect1_foregroundBlur_49_480"/>
+</filter>
+<linearGradient id="brand-onion-logo-paint0_linear_49_480" x1="61.4928" y1="70.7998" x2="43.7928" y2="70.7998" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="1" stop-color="white" stop-opacity="0.6"/>
+</linearGradient>
+<linearGradient id="brand-onion-logo-paint1_linear_49_480" x1="122.393" y1="70.7998" x2="140.093" y2="70.7998" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="1" stop-color="white" stop-opacity="0.6"/>
+</linearGradient>
+</defs></svg>

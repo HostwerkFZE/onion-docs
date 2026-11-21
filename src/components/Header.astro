@@ -1,0 +1,123 @@
+---
+import config from 'virtual:starlight/user-config';
+import Search from 'virtual:starlight/components/Search';
+import SiteTitle from 'virtual:starlight/components/SiteTitle';
+import SocialIcons from 'virtual:starlight/components/SocialIcons';
+import { topics, withBase, currentTopic, DASHBOARD_URL } from './topics';
+
+const shouldRenderSearch =
+	config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
+const active = currentTopic(Astro.url.pathname);
+---
+
+<div class="header">
+	<div class="brand sl-flex">
+		<SiteTitle />
+		<a class="docs-pill" href={withBase('')}>Docs</a>
+	</div>
+	<nav class="topics sl-hidden lg:sl-flex print:hidden" aria-label="Topics">
+		{
+			topics.map((t) => (
+				<a href={withBase(t.href)} aria-current={active === t ? 'page' : undefined}>
+					{t.label}
+				</a>
+			))
+		}
+	</nav>
+	<div class="search sl-flex print:hidden">{shouldRenderSearch && <Search />}</div>
+	<div class="right sl-hidden md:sl-flex print:hidden">
+		<div class="sl-flex social"><SocialIcons /></div>
+		<a class="dashboard" href={DASHBOARD_URL}>Dashboard</a>
+	</div>
+</div>
+
+<style>
+	.header {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		height: 100%;
+	}
+	.brand {
+		align-items: center;
+		gap: 0.625rem;
+		flex-shrink: 0;
+	}
+	.brand :global(.site-title img) {
+		height: 22px;
+		width: auto;
+	}
+	.docs-pill {
+		font: var(--font-label-sm);
+		letter-spacing: var(--tracking-label-sm);
+		color: var(--brand-medium);
+		background: var(--brand-deep);
+		border: 1px solid var(--border-brand);
+		border-radius: 999px;
+		padding: 3px 9px;
+		text-decoration: none;
+		text-transform: uppercase;
+		font-size: 11px;
+		letter-spacing: 0.04em;
+	}
+	.topics {
+		gap: 0.25rem;
+		align-items: center;
+		height: 100%;
+	}
+	.topics a {
+		position: relative;
+		display: flex;
+		align-items: center;
+		height: 100%;
+		padding: 0 0.75rem;
+		font: var(--font-label-lg);
+		letter-spacing: var(--tracking-label-lg);
+		color: var(--fg-subtle);
+		text-decoration: none;
+		transition: color 120ms ease;
+	}
+	.topics a:hover {
+		color: var(--fg-primary);
+	}
+	.topics a[aria-current='page'] {
+		color: var(--fg-primary);
+	}
+	.topics a[aria-current='page']::after {
+		content: '';
+		position: absolute;
+		left: 0.75rem;
+		right: 0.75rem;
+		bottom: -1px;
+		height: 2px;
+		border-radius: 2px;
+		background: var(--brand-accent);
+	}
+	.search {
+		flex: 1;
+		justify-content: flex-end;
+		min-width: 0;
+	}
+	.right {
+		gap: 1rem;
+		align-items: center;
+	}
+	.social {
+		gap: 1rem;
+		align-items: center;
+	}
+	.dashboard {
+		font: var(--font-label-lg);
+		letter-spacing: var(--tracking-label-lg);
+		color: var(--bg-page);
+		background: var(--fg-primary);
+		border-radius: 10px;
+		padding: 7px 14px;
+		text-decoration: none;
+		white-space: nowrap;
+		transition: background 120ms ease;
+	}
+	.dashboard:hover {
+		background: var(--brand-medium);
+	}
+</style>

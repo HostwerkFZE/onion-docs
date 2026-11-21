@@ -1,0 +1,57 @@
+# Builds the site from the Markdown in src/content/docs and publishes it to
+# GitHub Pages. Pull requests are built too, so a broken page fails the check
+# before it is merged; only main is deployed.
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # "Last updated" on every page is read from git history.
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          # A custom domain sets the repository variables DOCS_SITE
+          # (https://docs.example.com) and DOCS_BASE (/); without them the
+          # site is built for https://<owner>.github.io/<repo>/.
+          DOCS_SITE: ${{ vars.DOCS_SITE || format('https://{0}.github.io', github.repository_owner) }}
+          DOCS_BASE: ${{ vars.DOCS_BASE || format('/{0}', github.event.repository.name) }}
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
