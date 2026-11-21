@@ -4,13 +4,14 @@ Public documentation for [Onion](https://onion4.ai): guides, the HTTP API and
 the MCP server. Built with [Starlight](https://starlight.astro.build) (Astro)
 from the Markdown in `src/content/docs`, styled with the Onion design tokens,
 and published to GitHub Pages by `.github/workflows/deploy.yml` on every push
-to `main`.
+to `main`. Readers get it at **https://onion4.ai/docs/**: the landing's nginx
+(onion-landing `nginx.conf`) serves the Pages site under that path.
 
 ## Run it
 
 ```sh
 npm ci
-npm run dev        # http://localhost:4321/onion-docs/
+npm run dev        # http://localhost:4321/docs/
 npm run build      # into dist/, with the search index
 npm run preview    # serve dist/
 ```
@@ -49,7 +50,12 @@ KIT_DIR=/path/to/onion-ui-kit npm run sync-tokens
 
 ## Deploy
 
-GitHub Pages, source "GitHub Actions". The site is built for
-`https://<owner>.github.io/<repo>/`. For a custom domain, set the repository
-variables `DOCS_SITE` (`https://docs.example.com`) and `DOCS_BASE` (`/`) and
-add the domain in Settings → Pages.
+GitHub Pages, source "GitHub Actions". The pages are fetched from
+`https://hostwerkfze.github.io/onion-docs/` by the landing and shown at
+`https://onion4.ai/docs/`, so the site is built for that address
+(`astro.config.mjs`); opened directly on github.io it has no styles.
+
+To move it to a host of its own (`docs.onion4.ai`): set the repository
+variables `DOCS_SITE` (`https://docs.onion4.ai`) and `DOCS_BASE` (`/`), add
+the domain in Settings → Pages, and point the landing's `/docs/` at it with a
+redirect.
