@@ -32,11 +32,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # A custom domain sets the repository variables DOCS_SITE
-          # (https://docs.example.com) and DOCS_BASE (/); without them the
-          # site is built for https://<owner>.github.io/<repo>/.
-          DOCS_SITE: ${{ vars.DOCS_SITE || format('https://{0}.github.io', github.repository_owner) }}
-          DOCS_BASE: ${{ vars.DOCS_BASE || format('/{0}', github.event.repository.name) }}
+          # Empty unless the repository sets them; astro.config.mjs then
+          # builds for https://onion4.ai/docs/, where the landing serves it.
+          DOCS_SITE: ${{ vars.DOCS_SITE }}
+          DOCS_BASE: ${{ vars.DOCS_BASE }}
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request'
         with:

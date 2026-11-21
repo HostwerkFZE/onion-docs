@@ -3,11 +3,14 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import rehypeBaseLinks from './src/plugins/rehype-base-links.mjs';
 
-// Where the site is served. GitHub Pages puts a project site under
-// /<repo>/; a custom domain serves it from the root. The workflow passes both,
-// so the same sources build for either.
-const site = process.env.DOCS_SITE ?? 'https://hostwerkfze.github.io';
-const base = process.env.DOCS_BASE ?? '/onion-docs';
+// Where the site is read. For now that is onion4.ai/docs/: the landing's nginx
+// fetches the pages from GitHub Pages (hostwerkfze.github.io/onion-docs/) and
+// serves them under /docs/, so the site is built for that address — its links,
+// canonical URLs and sitemap all say onion4.ai/docs. When the docs get a host of
+// their own, set the repository variables DOCS_SITE and DOCS_BASE (or change
+// these defaults); the workflow passes them through.
+const site = process.env.DOCS_SITE || 'https://onion4.ai';
+const base = process.env.DOCS_BASE || '/docs';
 
 export default defineConfig({
 	site,
