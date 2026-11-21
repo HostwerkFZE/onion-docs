@@ -1,11 +1,11 @@
 ---
 title: Results and formats
-description: What a result tells you, how to download the data, and how to get it in the format and shape you need.
+description: The result resource, downloading the data, result-schema and artifacts.
 ---
 
-When a request is `ready`, `GET /parse-requests/{id}/result` returns the result: facts about the crawl, and a link to the data.
+`GET /parse-requests/{id}/result` returns the result once the request is `ready`:
 
-```json title="GET /api/v1/parse-requests/{id}/result"
+```json
 { "data": { "type": "parse-results", "id": "…", "attributes": {
   "data-found": true,
   "reason": null,
@@ -17,24 +17,22 @@ When a request is `ready`, `GET /parse-requests/{id}/result` returns the result:
   "block-class": null,
   "rendered": false,
   "transport": "fetch",
-  "final-url": "https://onion4.ai/products",
-  "page": { "title": "Products", "language": "en" }
+  "final-url": "https://example.com/",
+  "page": { "title": "Example Domain" }
 } } }
 ```
 
-Until the request settles, the same read answers `{"data": null, "meta": {"status": "processing"}}` — and for a failed one, `meta.status` is `failed` with `meta.error`.
+Before that it returns `200` with `{"data": null, "meta": {"request-id": "…", "status": "queued" | "processing" | "failed"}}`, plus `meta.error` for a failed request.
 
-## The data itself
+## Data
 
-The data is not inline: it is behind `download-url`, a presigned link that expires at `url-expires-at`. Fetch it right away, **without** your `Authorization` header — the signature is the permission. Do not store the link; when you need the data again, read the result again for a fresh one. `content-type` and `size-bytes` describe what you will get.
+The data is downloaded from `download-url`, a presigned link valid until `url-expires-at`. Request it without the `Authorization` header. For a new link, read the result again.
 
-## Formats
-
-The format follows your instruction. Ask for it in plain words — "return the result in json", "as a CSV table", "as Markdown" — and `content-type` tells you what came back. A URL with no instruction returns the page's raw HTML.
+The format follows the instruction ("return the result in json", "as CSV"); `content-type` gives the format returned. `output-format` is accepted and stored on the request but does not change the result.
 
 ## Structured extraction
 
-When the shape has to be exact — the same keys, the same types, every time — pass a JSON Schema as `result-schema`. The answer is JSON that follows it:
+`result-schema` — a JSON Schema object; the result is JSON following it. Available on every plan.
 
 ```json
 { "data": { "type": "parse-requests", "attributes": {
@@ -42,31 +40,29 @@ When the shape has to be exact — the same keys, the same types, every time —
   "result-schema": {
     "type": "object",
     "required": ["price"],
-    "properties": {
-      "price":    { "type": "number" },
-      "currency": { "type": "string" }
-    }
+    "properties": { "price": { "type": "number" }, "currency": { "type": "string" } }
   }
 } } }
 ```
 
-`result-schema` is available on every plan: it decides the shape of the answer, not how much work it is.
+A schema the crawler rejects (invalid, or larger than 32 KB) is not refused on submission: the request becomes `failed`.
 
-## What the other fields mean
+## Fields
 
 | Field | Meaning |
 |---|---|
-| `data-found` | Whether the page held what you asked for. `false` is a finished crawl of a page that did not — see `reason`. |
-| `reason` | Why nothing was found, when `data-found` is `false`. |
-| `http-status` | The status of the final page the crawl captured. A captured 403 or 404 page is still a successful capture. |
-| `block-class` | Set when the site answered with a challenge or a block page (for example `cf_challenge`). A hint, not a verdict: read it with `http-status`. |
-| `rendered`, `transport` | Whether the page went through a browser (`render`) or a plain fetch (`fetch`). |
-| `escalated` | The crawl was re-planned along the way — for example, a fetch turned into a render. |
-| `truncated-input` | The page was too large and was cut; the extraction ran on part of it. |
-| `final-url` | Where the crawl ended up after redirects. |
-| `suggested-url` | A page on the same site where the data more likely is — when a consent overlay, a regional version or the wrong section hid it. |
-| `page` | Facts about the page when it carries trustworthy ones: `title`, `description`, `canonical-url`, `language`, `published-date`, `author`. |
+| `data-found` | Whether the requested data was extracted. |
+| `reason` | Why not, when `data-found` is `false`. |
+| `content-type`, `size-bytes`, `sha256` | The downloadable data. |
+| `http-status` | HTTP status of the final captured page. A captured 403 or 404 page is still a capture. |
+| `block-class` | Heuristic classification of a blocked final page: `cf_challenge`, `captcha`, `forbidden`, `not_found`, `rate_limited`, `upstream_error`, `timeout`, `network`, `ssrf_blocked`, `unsupported_content_type`. Cleared by a successful extraction. |
+| `rendered`, `transport` | `render` — the page went through a browser; `fetch` — a plain HTTP fetch. |
+| `escalated` | The task was re-planned at least once. |
+| `truncated-input` | The page exceeded the fetch size limit; extraction ran on part of it. |
+| `final-url` | The URL after redirects. |
+| `suggested-url` | A page on the same domain where the data is more likely (for example behind a consent overlay or a regional version). |
+| `page` | Page metadata when present: `title`, `description`, `canonical-url`, `language`, `published-date`, `author`. |
 
-## Everything the crawl kept
+## Artifacts
 
-`GET /parse-requests/{id}/artifacts` lists every capture a finished request has — the result first, then whatever else the crawl stored — each with its `type`, `content-type`, `size-bytes` and its own short-lived `download-url`.
+`GET /parse-requests/{id}/artifacts` lists the stored captures of a `ready` request: `result` first, then the others by `type` (`html`, `json`, `markdown`, `screenshot`, `structured_json`). Each has `content-type`, `size-bytes`, `url-expires-at` and a `download-url` (a screenshot has a `view-url`). Links are valid for 5 minutes. For other statuses the list is empty and `meta.status` gives the status.

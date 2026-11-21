@@ -8,8 +8,6 @@ export const topics = [
 	{ label: 'API reference', href: 'api/overview/', prefix: 'api/' },
 ];
 
-export const DASHBOARD_URL = 'https://user.onion4.ai/';
-
 export function withBase(path: string) {
 	const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 	return `${base}/${path}`;

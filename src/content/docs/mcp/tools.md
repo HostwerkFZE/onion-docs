@@ -1,79 +1,76 @@
 ---
 title: Tools
-description: The seven tools of the Onion MCP server — parameters, answers and when to use each.
+description: Parameters and outputs of the Onion MCP tools.
 ---
 
-| Tool | What it does |
+| Tool | |
 |---|---|
-| [`extract`](#extract) | Submits an extraction; returns a job id in milliseconds. |
-| [`extract_and_wait`](#extract_and_wait) | Submits and waits for the outcome, up to two minutes. |
-| [`extract_status`](#extract_status) | Cheap status read. |
-| [`extract_result`](#extract_result) | The authoritative outcome. |
-| [`extract_progress`](#extract_progress) | The stages a job has been through. |
-| [`feedback`](#feedback) | Report how an extraction actually turned out. |
-| [`whoami`](#whoami) | Anonymous or authenticated, and what the plan allows. |
+| [`extract`](#extract) | Submit; returns a job id. |
+| [`extract_and_wait`](#extract_and_wait) | Submit (or attach to a job) and wait up to 120 s. |
+| [`extract_status`](#extract_status) | Status of a job. |
+| [`extract_result`](#extract_result) | Outcome of a job. |
+| [`extract_progress`](#extract_progress) | Pipeline events of a job. |
+| [`feedback`](#feedback) | Verdict on a result. |
+| [`whoami`](#whoami) | Anonymous or authenticated; the plan's entitlements. |
 
-## `extract`
+## extract
 
-Submits an extraction and returns at once. Give a URL and an instruction in plain language; a bare URL with no instruction returns the page itself.
-
-| Parameter | | |
+| Parameter | Type | |
 |---|---|---|
-| `prompt` | string | What to extract, in plain language. May contain the URL. Counts against the plan's prompt size. |
-| `url` | string | The page. Optional when `prompt` contains exactly one http(s) URL. |
-| `mode` | `fast` \| `full` | `fast` (default) opens the page; `full` also scrolls and runs scripts for lazy content. |
-| `result_schema` | object | A JSON Schema the answer must follow. Needs a key. |
-| `output_format` | `markdown` \| `text` \| `json` \| `table` \| `csv` \| `schema` | The format you want. Needs a key. |
-| `idempotency_key` | string | Resubmitting with the same key returns the original job instead of starting a second one. |
+| `prompt` | string | The instruction. May contain the URL. Limited by the plan's prompt size (anonymous: 8,192 characters). |
+| `url` | string | The page. Optional if `prompt` contains exactly one http(s) URL. Without `prompt`, the raw HTML of the page is returned. |
+| `mode` | `fast` \| `full` | Default `fast`. [Crawl options](/guides/crawl-options/#mode) |
+| `result_schema` | object | JSON Schema for the result. Requires a key. |
+| `output_format` | `markdown` \| `text` \| `json` \| `table` \| `csv` \| `schema` | Requires a key. Stored on the request; the format follows the instruction. |
+| `idempotency_key` | string, 8–128 | Resubmitting with the same key returns the original job. |
 
-```json title="Answer"
-{ "job_id": "6f1c…", "status": "queued", "url": "https://onion4.ai/products", "mode": "fast",
-  "note": "Read the outcome with extract_result once the status is ready or failed." }
-```
+Output: `job_id`, `status`, `url`, `mode`, `note`.
 
-## `extract_and_wait`
+## extract_and_wait
 
-The same parameters as `extract`, plus:
+The `extract` parameters, plus:
 
-| Parameter | | |
+| Parameter | Type | |
 |---|---|---|
-| `wait_seconds` | integer | How long to wait. Default 60, maximum 120. |
-| `job_id` | string | Wait on a job that is already running instead of submitting a new one. |
+| `wait_seconds` | integer | Default 60, maximum 120. |
+| `job_id` | string | Wait for an existing job instead of submitting. |
 
-It answers like [`extract_result`](#extract_result). If the job is not done in time, the answer is `status: "processing"` with the job id — the work continues, and `extract_result` reads it later. When the server is holding many waits at once, it may answer straight away with the job id and a note to poll; that is not an error either.
+Output: as `extract_result`. If the job has not finished in time — its current status (`queued` or `processing`) and `job_id`; the job continues. When too many waits are open on the server, the call returns immediately with the job id and a `note`.
 
-## `extract_status`
+## extract_status
 
-`job_id` in; `queued`, `processing`, `ready` or `failed` out. Use it to poll cheaply.
+Input `job_id`. Output `job_id`, `status` (`queued`, `processing`, `ready`, `failed`), `url`, `mode`.
 
-## `extract_result`
+## extract_result
 
-`job_id` in; the outcome out.
+Input `job_id`.
 
-| Field | Meaning |
+| Field | |
 |---|---|
-| `status` | `queued`, `processing`, `ready` or `failed`. |
-| `data_found` | `true` — the data is here. `false` with a `reason` — a **successful** crawl of a page that held nothing matching, not an error. |
-| `block_class` | Set when the site refused the crawl. A reported outcome: retrying the same way will usually be refused the same way. |
-| `http_status`, `rendered` | What the crawl saw, and whether the page went through a browser. |
-| `inline` | The data itself, when it is text and small (up to 64 KB). |
-| `download_url`, `content_type` | A short-lived link to the data, for anything larger. |
-| `error`, `error_code` | Why a `failed` job failed. |
+| `job_id`, `status` | |
+| `data_found` | `true` — data extracted; `false` — not, see `reason`. `null` until finished. |
+| `reason` | Why nothing was found. |
+| `block_class` | Classification of a blocked final page. [Fields](/guides/results/#fields) |
+| `http_status`, `rendered` | Status of the final page; whether it was rendered in a browser. |
+| `content_type`, `download_url` | The data; the link is valid for 5 minutes. |
+| `inline` | The data itself when it is JSON or text up to 64 KB (JSON parsed, text as a string). Best effort. |
+| `error`, `error_code` | For a `failed` job. |
+| `note` | Hint for the agent. |
 
-## `extract_progress`
+## extract_progress
 
-`job_id` in; the stages the job has been through — planning, crawling, extracting, the turns of the extraction loop. Use it on a job that is taking a while: it tells "still working" from "stuck". It is not the outcome; that is `extract_result`.
+Input `job_id`. Output: `job_id`, `status`, `phase`, `events` (the pipeline events: `queued`, `crawling`, `crawl_job.succeeded`, `extracting`, …), `note`. See [Events](/guides/request-lifecycle/#events).
 
-## `feedback`
+## feedback
 
-Report how an extraction actually turned out, once you have tried to use it. The agent is the only party that can tell the data was stale, answered a different question, or that "no data" was wrong because the page plainly has it.
-
-| Parameter | | |
+| Parameter | Type | |
 |---|---|---|
 | `verdict` | `helpful` \| `incomplete` \| `wrong` \| `unusable` | Required. |
-| `job_id` | string | The extraction this is about. Leave it out for feedback about the service in general. |
-| `detail` | string | What was wrong and what you expected instead. Required unless the verdict is `helpful`. |
+| `job_id` | string | Optional; without it the feedback is about the service. |
+| `detail` | string, up to 4096 bytes | Required unless `verdict` is `helpful`. |
 
-## `whoami`
+Output: `feedback_id`, `note`.
 
-No parameters. Says whether the session is anonymous or authenticated and, with a key, what the plan allows — call it before using a plan-gated option, or just send one and read the refusal, which names what would unlock it.
+## whoami
+
+No parameters. Output: `authenticated`, `user_id` (with a key), `entitlements` (the plan's services), `note`.

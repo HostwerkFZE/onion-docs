@@ -1,81 +1,60 @@
 ---
 title: Connect a client
-description: Add Onion to Claude Desktop, Claude Code, Cursor or any other MCP client.
+description: Claude Code, Claude Desktop, Cursor and other MCP clients.
 ---
-
-import { Steps, Aside } from '@astrojs/starlight/components';
-
-Every client needs the same two things: the server URL and, optionally, your key.
 
 | | |
 |---|---|
 | URL | `https://mcp.onion4.ai/mcp` |
 | Transport | Streamable HTTP |
-| Header | `Authorization: Bearer <YOUR_KEY>` — leave it out to work anonymously |
-
-Create a key in the [dashboard](https://user.onion4.ai/) under **API keys**. The dashboard's **Connect** page has the same snippets with your server URL filled in.
+| Header | `Authorization: Bearer <YOUR_KEY>` (omit to work anonymously) |
 
 ## Claude Code
-
-Run in your project, then start `claude`:
 
 ```sh
 claude mcp add --transport http onion https://mcp.onion4.ai/mcp \
   --header "Authorization: Bearer <YOUR_KEY>"
 ```
 
-Check it with `/mcp` inside Claude Code: `onion` should be listed as connected.
+`/mcp` inside Claude Code shows the connection status.
 
 ## Claude Desktop
 
-<Steps>
+`claude_desktop_config.json` (**Settings → Developer → Edit Config**) starts local stdio servers. A remote server with a header is connected through the [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) bridge (requires Node.js):
 
-1. Open **Claude Desktop → Settings → Developer**.
-2. Select **Edit Config**.
-3. Add the server, save the file and restart Claude.
+```json title="claude_desktop_config.json"
+{
+  "mcpServers": {
+    "onion": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.onion4.ai/mcp",
+               "--header", "Authorization:${ONION_AUTH}"],
+      "env": { "ONION_AUTH": "Bearer <YOUR_KEY>" }
+    }
+  }
+}
+```
 
-   ```json title="claude_desktop_config.json"
-   {
-     "mcpServers": {
-       "onion": {
-         "type": "http",
-         "url": "https://mcp.onion4.ai/mcp",
-         "headers": {
-           "Authorization": "Bearer <YOUR_KEY>"
-         }
-       }
-     }
-   }
-   ```
-
-</Steps>
+Restart Claude Desktop after saving.
 
 ## Cursor
 
-<Steps>
+**Settings → MCP → Add new global MCP server**:
 
-1. Open **Cursor → Settings → MCP**.
-2. Select **Add new global MCP server**.
-3. Paste the configuration and save the file.
+```json title="mcp.json"
+{
+  "mcpServers": {
+    "onion": {
+      "url": "https://mcp.onion4.ai/mcp",
+      "headers": { "Authorization": "Bearer <YOUR_KEY>" }
+    }
+  }
+}
+```
 
-   ```json title="mcp.json"
-   {
-     "mcpServers": {
-       "onion": {
-         "url": "https://mcp.onion4.ai/mcp",
-         "headers": {
-           "Authorization": "Bearer <YOUR_KEY>"
-         }
-       }
-     }
-   }
-   ```
+## Other clients
 
-</Steps>
-
-## Any other client
-
-Any MCP client that speaks Streamable HTTP connects with the URL and the header above. To check the URL, the key and TLS from a terminal, send the protocol's opening call — the server answers with its name:
+Any client with Streamable HTTP support connects with the URL and header above. Connection check from a terminal — the `initialize` call returns the server name:
 
 ```sh
 curl -sS -X POST https://mcp.onion4.ai/mcp \
@@ -85,16 +64,4 @@ curl -sS -X POST https://mcp.onion4.ai/mcp \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{
         "protocolVersion":"2025-06-18","capabilities":{},
         "clientInfo":{"name":"curl","version":"0"}}}'
-```
-
-<Aside type="note">
-The server is stateless: it issues no `Mcp-Session-Id`, and `GET` or `DELETE` on `/mcp` answer `405`. Every `POST` stands on its own, with the key it carries.
-</Aside>
-
-## Try it
-
-Ask your agent:
-
-```text
-Use Onion to extract the product name, price and availability from this page: https://onion4.ai/products
 ```

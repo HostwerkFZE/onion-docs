@@ -1,6 +1,6 @@
 ---
 import SocialIcons from 'virtual:starlight/components/SocialIcons';
-import { topics, withBase, currentTopic, DASHBOARD_URL } from './topics';
+import { topics, withBase, currentTopic } from './topics';
 
 const active = currentTopic(Astro.url.pathname);
 ---
@@ -17,7 +17,6 @@ const active = currentTopic(Astro.url.pathname);
 </nav>
 <div class="mobile-preferences sl-flex">
 	<div class="social-icons"><SocialIcons /></div>
-	<a class="dashboard" href={DASHBOARD_URL}>Dashboard</a>
 </div>
 
 <style>
@@ -52,13 +51,5 @@ const active = currentTopic(Astro.url.pathname);
 		display: flex;
 		gap: 1rem;
 		align-items: center;
-	}
-	.dashboard {
-		font: var(--font-label-lg);
-		color: var(--bg-page);
-		background: var(--fg-primary);
-		border-radius: 10px;
-		padding: 7px 14px;
-		text-decoration: none;
 	}
 </style>

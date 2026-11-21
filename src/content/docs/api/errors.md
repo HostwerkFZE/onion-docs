@@ -1,9 +1,7 @@
 ---
 title: Errors
-description: The error object, and every code the API answers with.
+description: Error object and codes.
 ---
-
-Errors are [JSON:API error objects](https://jsonapi.org/format/#error-objects): an `errors` array with one object, carrying the HTTP `status`, a stable `code`, a short `title` and a human `detail`.
 
 ```json
 { "errors": [ {
@@ -17,25 +15,29 @@ Errors are [JSON:API error objects](https://jsonapi.org/format/#error-objects): 
 
 | Member | |
 |---|---|
-| `code` | What to branch on. Stable. |
-| `detail` | What to show a person. Wording may change. |
-| `source.pointer` | For a `422`: which part of your request was wrong, `/data/attributes/input`. |
-| `meta.required-service` | For a `403 forbidden_entitlement`: the plan service that would allow it. |
+| `status`, `code`, `title` | Always present. Branch on `code`. |
+| `detail` | Present when there is one. |
+| `source.pointer` | On most `422`s: the attribute (`/data/attributes/input`) or query parameter (`/filter[since]`). |
+| `meta.required-service` | On `403 forbidden_entitlement`: the plan service required. |
+
+WebSocket handshake refusals are plain text, not this object ([Live status](/api/websocket/#refusals)).
 
 ## Codes
 
-| Status | Code | Meaning |
+| Status | Code | |
 |---|---|---|
-| `401` | `unauthenticated` | No key where one is needed, or a key that does not resolve. |
-| `403` | `forbidden_entitlement` | The plan does not include this. |
+| `400` | `malformed` | The body is not valid JSON (`/feedback`). |
+| `401` | `unauthenticated` | The key is unknown, revoked or expired; or no key on a route that requires one (`/me`, `/activity`, history). |
+| `403` | `forbidden_entitlement` | Not included in the plan. |
 | `403` | `session_required` | Account management; dashboard only. |
-| `404` | `not_found` | No such resource — or not yours. |
-| `409` | `idempotency_key_conflict` | The `Idempotency-Key` was used with a different body. |
-| `409` | `key_limit_reached` | The account already has 100 keys. |
-| `422` | `validation_error` | The request is malformed: see `detail` and `source.pointer`. |
-| `422` | `not_available` | A reserved option that is not available yet. |
-| `429` | `rate_limited` | The rate is spent. Wait `Retry-After` seconds. |
-| `500` | `internal_error` | Our fault. |
-| `502` | `upstream_unavailable` | A service behind the API is down. |
+| `403` | `recaptcha_failed` | A submission without a key. |
+| `404` | `not_found` | No such resource, or not yours. |
+| `409` | `idempotency_key_conflict` | The `Idempotency-Key` was used with a different URL or instruction. |
+| `422` | `validation_error` | Invalid request; see `detail` and `source.pointer`. |
+| `422` | `not_available` | Reserved feature: `fresh-data: true`, an array in `data`. |
+| `429` | `rate_limited` | Submission limit reached; `Retry-After` in seconds. |
+| `500` | `internal_error` | Server error. |
+| `503` | `upstream_unavailable` | The key could not be verified at the moment. |
+| `503` | `recaptcha_unconfigured` | A submission without a key while anonymous submission is unavailable. |
 
-What to do about each: [Handling errors](/guides/errors/).
+Handling: [Handling errors](/guides/errors/).

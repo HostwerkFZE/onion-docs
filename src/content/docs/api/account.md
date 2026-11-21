@@ -1,41 +1,44 @@
 ---
 title: Account
-description: Your plan and live limits, your history counted by day and site, and the plan catalogue.
+description: GET /me, GET /activity, GET /plans.
 ---
 
 ## Me
 
 <span class="method get">GET</span> <span class="endpoint">/me</span>
 
-Who the key belongs to, what the plan allows and where you stand right now. Not metered — read it as often as you like.
+The account, its plan and current limits. Not counted against the rate limit.
 
 ```json
 { "data": { "type": "users", "id": "0f2c…",
-  "attributes": { "email": "you@example.com", "display-name": "…", "created-at": "…" },
+  "attributes": { "email": "you@example.com", "display-name": "…", "avatar-url": null, "created-at": "…" },
+  "relationships": { "settings": { … }, "subscription": { … }, "api-key": { … } },
   "meta": {
     "plan": "pro",
     "entitlements": { "rate-per-minute": 60, "concurrent-requests": 60, "prompt-budget": 4096,
-                      "history-retention": 0, … },
+                      "history-retention": 0, "platform-selection": true, "geo-routing": "auto", … },
     "rate-limit":  { "metered": true, "limit-minute": 60, "remaining-minute": 41, "reset-minute-sec": 0 },
-    "concurrency": { "metered": true, "limit": 60, "in-flight": 4, "waiting": 12, "available": 56 }
+    "concurrency": { "metered": true, "limit": 60, "in-flight": 4, "waiting": 12, "available": 56 },
+    "offer": { … }, "settings": { … }
   } } }
 ```
 
-- `entitlements` — the plan, computed: quotas as numbers, features as flags.
-- `rate-limit` — the bucket behind [requests per minute](/guides/rate-limits/#requests-per-minute). `metered: false` alone means nothing is counted.
-- `concurrency` — [requests at once](/guides/rate-limits/#requests-at-once): `in-flight` running, `waiting` queued, `available` free.
+- `plan` — the plan slug; empty without a subscription.
+- `entitlements` — the plan's services: quotas as numbers, flags as booleans, levels as strings; services not in the plan are `false`.
+- `rate-limit` — the [submission bucket](/guides/rate-limits/). Hour and day windows (`limit-hour`, `limit-day`, …) appear only if the deployment meters them. `metered: false` — nothing is counted.
+- `concurrency` — `in-flight` running, `waiting` queued, `available` free slots. Without a cap: `metered: false` and no `limit`/`available`.
 
 ## Activity
 
 <span class="method get">GET</span> <span class="endpoint">/activity</span>
 
-Your history, counted — requests per day and door, split by outcome, and your ten busiest sites. It costs the same whether you have a hundred requests or a hundred million.
+Request counts per day and source, and the ten busiest sites.
 
 | Query | |
 |---|---|
-| `period` | `7d`, `30d` (default), `90d` or `all`. The window starts at midnight in `tz`, `period − 1` days ago, and ends now. |
-| `tz` | An IANA time zone, `Europe/Berlin`. Defaults to your account's setting, or UTC. |
-| `filter[source]` | `api`, `mcp` or `web` — every figure for one door. |
+| `period` | `7d`, `30d` (default), `90d`, `all`. Starts at midnight in `tz`, `period − 1` days ago; ends now. |
+| `tz` | IANA time zone. Default: the account setting, otherwise UTC. |
+| `filter[source]` | `api`, `mcp` or `web`. |
 
 ```json
 { "data": { "type": "activity", "id": "0f2c…", "attributes": {
@@ -50,12 +53,16 @@ Your history, counted — requests per day and door, split by outcome, and your 
   "meta": { "retention-days": 0, "hidden-by-plan": 0 } }
 ```
 
-- `days` lists only days and doors that saw a request, oldest first; draw the empty ones yourself. Days are exact in any time zone.
-- `domains` are counted in whole UTC days, so their window starts at the UTC midnight nearest `since` — that is `domains-since`.
-- `first-request-at` is your first request ever, `null` if there is none: a new account and a quiet month look different.
+- `days` — only days and sources with requests, oldest first.
+- `domains` — counted in whole UTC days from `domains-since`, the UTC midnight nearest `since`.
+- The plan's history retention narrows the window; `meta.hidden-by-plan` counts requests outside it.
+- `since` and `domains-since` are `null` for `period=all` with unlimited retention.
+- `first-request-at` — the account's first request, regardless of `filter[source]`; `null` if none.
+
+An invalid `period` or `tz`: `422`.
 
 ## Plans
 
 <span class="method get">GET</span> <span class="endpoint">/plans</span>
 
-The plan catalogue: names, prices and every service each plan includes, with its value. No key needed — [try it](https://user.onion4.ai/api/v1/plans). Summarised in [Plans and limits](/getting-started/plans/).
+The plan catalogue: name, price and the services of each plan with their values. No key required. [Plans and limits](/getting-started/plans/)

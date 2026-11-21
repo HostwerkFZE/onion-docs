@@ -1,9 +1,7 @@
 ---
 title: API reference
-description: Base URL, authentication, the JSON:API format, pagination and the machine-readable spec.
+description: Base URL, authentication, format, pagination and the OpenAPI spec.
 ---
-
-The Onion HTTP API is a JSON:API service over HTTPS. Everything a key can do is on these pages; the complete, machine-readable description is the [OpenAPI spec](#openapi).
 
 ## Base URL
 
@@ -13,49 +11,43 @@ https://user.onion4.ai/api/v1
 
 ## Authentication
 
-Send your [API key](/getting-started/api-keys/) as a bearer token on every call:
-
 ```http
 Authorization: Bearer onion_sk_...
 ```
 
-A key does the work — submit, read, watch, judge. Account management (keys, plan, settings) is dashboard-only and answers `403 session_required` to a key.
+A request without the header is anonymous. An anonymous submission through the API is refused (`403`); see [Errors](/api/errors/). Account management (keys, plan, settings) is dashboard-only and answers `403 session_required` to a key.
 
 ## Format
 
-Requests and responses use [JSON:API v1.1](https://jsonapi.org/format/), media type `application/vnd.api+json`:
+[JSON:API v1.1](https://jsonapi.org/format/), media type `application/vnd.api+json`. Attribute names are kebab-case: `created-at`, `data-found`, `download-url`.
 
-```json
-{ "data": { "type": "parse-requests", "id": "6f1c…", "attributes": { "status": "ready", … } } }
-```
-
-- Attribute names are **kebab-case**: `created-at`, `data-found`, `download-url`.
-- Request attributes are **closed**: a name the endpoint does not know is `422` with a pointer at it, never ignored.
-- Errors are JSON:API error objects — see [Errors](/api/errors/).
+`POST /parse-requests` refuses attribute names it does not know with `422` and a `source.pointer` to the attribute.
 
 ## Endpoints
 
 | | | |
 |---|---|---|
-| <span class="method post">POST</span> | `/parse-requests` | [Submit a URL and an instruction](/api/parse-requests/#submit) |
-| <span class="method get">GET</span> | `/parse-requests` | [Your request history](/api/parse-requests/#list) |
-| <span class="method get">GET</span> | `/parse-requests/{id}` | [One request's status](/api/parse-requests/#status) |
-| <span class="method get">GET</span> | `/parse-requests/{id}/result` | [The result](/api/parse-requests/#result) |
-| <span class="method get">GET</span> | `/parse-requests/{id}/events` | [The pipeline's stages](/api/parse-requests/#events) |
-| <span class="method get">GET</span> | `/parse-requests/{id}/artifacts` | [Everything the crawl stored](/api/parse-requests/#artifacts) |
+| <span class="method post">POST</span> | `/parse-requests` | [Submit](/api/parse-requests/#submit) |
+| <span class="method get">GET</span> | `/parse-requests` | [History](/api/parse-requests/#list) |
+| <span class="method get">GET</span> | `/parse-requests/{id}` | [Status](/api/parse-requests/#status) |
+| <span class="method get">GET</span> | `/parse-requests/{id}/result` | [Result](/api/parse-requests/#result) |
+| <span class="method get">GET</span> | `/parse-requests/{id}/events` | [Events](/api/parse-requests/#events) |
+| <span class="method get">GET</span> | `/parse-requests/{id}/artifacts` | [Artifacts](/api/parse-requests/#artifacts) |
 | <span class="method ws">WS</span> | `/ws?request-id={id}` | [Live status](/api/websocket/) |
-| <span class="method post">POST</span> | `/feedback` | [Judge an answer](/api/feedback/) |
-| <span class="method get">GET</span> | `/me` | [Your plan and limits](/api/account/#me) |
-| <span class="method get">GET</span> | `/activity` | [Your history, counted](/api/account/#activity) |
-| <span class="method get">GET</span> | `/plans` | [The plan catalogue](/api/account/#plans) |
+| <span class="method post">POST</span> | `/feedback` | [Feedback](/api/feedback/) |
+| <span class="method get">GET</span> | `/me` | [Account](/api/account/#me) |
+| <span class="method get">GET</span> | `/activity` | [Activity](/api/account/#activity) |
+| <span class="method get">GET</span> | `/plans` | [Plans](/api/account/#plans) |
+
+Other routes (bundles, payments, account events, support) are listed in the OpenAPI spec.
 
 ## Pagination
 
-Lists are cursor-paginated, newest first. Follow `links.next` as it is — it carries the cursor, the page size and every filter you gave — until it is absent.
+Lists are cursor-paginated, newest first. `links.next` is present while there is a next page and carries the cursor, page size and filters.
 
 ## OpenAPI
 
-The API serves its own description, and a test compares it with the router on every build, so it cannot drift from what the service does:
-
 - [Swagger UI](https://user.onion4.ai/api/v1/docs)
-- [`openapi.yaml`](https://user.onion4.ai/api/v1/openapi.yaml) · [`openapi.json`](https://user.onion4.ai/api/v1/openapi.json) — for client generators
+- [`openapi.yaml`](https://user.onion4.ai/api/v1/openapi.yaml), [`openapi.json`](https://user.onion4.ai/api/v1/openapi.json)
+
+A test checks that the spec lists exactly the routes the service serves.

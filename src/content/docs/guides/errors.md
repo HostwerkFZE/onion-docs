@@ -1,9 +1,9 @@
 ---
 title: Handling errors
-description: Which errors to fix, which to wait out and which to retry — and how to tell a failed request from an empty answer.
+description: Which errors to fix, which to retry, and how a failed request differs from an empty result.
 ---
 
-Errors come back as [JSON:API error objects](/api/errors/) with an HTTP status, a stable `code` and a human `detail`. Branch on `code`, show `detail`.
+Errors are [JSON:API error objects](/api/errors/): `status`, `code`, `title`, and, when there is one, `detail` and `source.pointer`. Branch on `code`.
 
 ```json
 { "errors": [ {
@@ -15,30 +15,31 @@ Errors come back as [JSON:API error objects](/api/errors/) with an HTTP status, 
 } ] }
 ```
 
-`source.pointer` names the part of your request that was wrong.
-
-## What to do with each
-
-| Status | Code | What to do |
+| Status | Code | Action |
 |---|---|---|
-| `401` | `unauthenticated` | Check the key: it is missing, mistyped, cut short or deleted. Do not retry as is. |
-| `403` | `forbidden_entitlement` | Your plan does not include this; `meta.required-service` names what would. Drop the option or upgrade. |
-| `403` | `session_required` | Account management — do it in the dashboard. |
-| `404` | `not_found` | No such request — or not yours. The two read the same on purpose. |
-| `409` | `idempotency_key_conflict` | The `Idempotency-Key` was used for a different body. Use a new key for new work. |
-| `422` | `validation_error` | Fix the request: see `detail` and `source.pointer`. Retrying unchanged will fail the same way. |
-| `429` | `rate_limited` | Wait `Retry-After` seconds and send the same request again. |
-| `502` | `upstream_unavailable` | Something behind Onion is down. Retry with backoff. |
-| `500` | `internal_error` | Our fault. Retry with backoff; if it persists, [tell us](https://onion4.ai/support). |
+| `401` | `unauthenticated` | The key is unknown, revoked or expired. Fix the key; do not retry. |
+| `403` | `forbidden_entitlement` | Not included in the plan; `meta.required-service` names the service. |
+| `403` | `session_required` | Account management; only from the dashboard. |
+| `404` | `not_found` | No such request, or not yours. |
+| `409` | `idempotency_key_conflict` | The `Idempotency-Key` was used with a different URL or instruction. |
+| `422` | `validation_error` | Fix the request; see `detail` and `source.pointer`. |
+| `422` | `not_available` | The option is reserved and not available yet. |
+| `429` | `rate_limited` | Wait `Retry-After` seconds and resend. |
+| `500` | `internal_error` | Retry with backoff. |
+| `503` | `upstream_unavailable` | The key could not be verified at the moment. Retry with backoff. |
 
-Retry only `429`, `5xx` and network errors — with the same [`Idempotency-Key`](/guides/retries/) each time.
+Retry `429`, `5xx` and network errors only, with the same [`Idempotency-Key`](/guides/retries/).
 
-## A finished request is not an error
+:::caution[No key means anonymous]
+A request without an `Authorization` header is anonymous, not `401`. An anonymous submission through the API is refused (`403`); reads of your requests return `404`.
+:::
 
-Errors above are about **the call**. What happened to **the work** is in the request's status and result, and it has three honest outcomes:
+## Request outcomes
 
-- `ready` with `data-found: true` — the data.
-- `ready` with `data-found: false` and a `reason` — the page holds nothing matching. Change the instruction or the URL; retrying will not help.
-- `failed` with `error` — the crawl did not complete. Worth trying again later.
+The status of a request is not an HTTP error. A finished request is one of:
 
-A result with `block-class` set means the site answered with a challenge or a block page. Trying a different [crawl option](/guides/crawl-options/) — `full` mode, another device — may get further than resending the same request.
+- `ready`, `data-found: true` — data found.
+- `ready`, `data-found: false` — the page was processed and holds nothing matching; `reason` says why.
+- `failed` — the request did not complete; `error` says why.
+
+With `data-found: false`, a set `block-class` means the final page was classified as blocked, not empty. See [Results](/guides/results/#fields).

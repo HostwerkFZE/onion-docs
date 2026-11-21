@@ -1,10 +1,8 @@
 ---
-import { Image } from 'astro:assets';
-import particles from '../assets/particles.png';
 import { withBase } from './topics';
 
-// The home page's hero: the frontmatter's title, tagline and actions over the
-// landing's particle cloud, with the first request beside them.
+// The home page's hero: the frontmatter's title, tagline and actions, with the
+// first request beside them.
 const { data } = Astro.locals.starlightRoute.entry;
 const { title = data.title, tagline, actions = [] } = data.hero || {};
 const href = (link: string) => (link.startsWith('/') ? withBase(link.slice(1)) : link);
@@ -12,7 +10,6 @@ const href = (link: string) => (link.startsWith('/') ? withBase(link.slice(1)) :
 
 <div class="hero not-content">
 	<div class="glow" aria-hidden="true"></div>
-	<Image class="cloud" src={particles} alt="" width={900} loading="eager" fetchpriority="high" />
 	<div class="copy">
 		<p class="eyebrow">Onion documentation</p>
 		<h1 id="_top" data-page-title set:html={title} />
@@ -34,10 +31,10 @@ const href = (link: string) => (link.startsWith('/') ? withBase(link.slice(1)) :
 		<div class="bar"><span></span><span></span><span></span><em>Your first request</em></div>
 		<pre><code><span class="c"># a URL and what you want from it</span>
 <span class="k">curl</span> -X POST https://user.onion4.ai/api/v1/parse-requests \
-  -H <span class="s">"Authorization: Bearer $ONION_KEY"</span> \
+  -H <span class="s">"Authorization: Bearer $ONION_API_KEY"</span> \
   -H <span class="s">"Content-Type: application/vnd.api+json"</span> \
   -d <span class="s">'&#123;"data":&#123;"type":"parse-requests","attributes":&#123;
-    "input":"https://onion4.ai/products extract product names, prices and availability, return the result in json"&#125;&#125;&#125;'</span>
+    "input":"https://example.com extract the page title, return the result in json"&#125;&#125;&#125;'</span>
 
 <span class="c"># → 201 &#123; "data": &#123; "id": "…", "attributes": &#123; "status": "queued" &#125; &#125; &#125;</span></code></pre>
 	</div>
@@ -67,19 +64,6 @@ const href = (link: string) => (link.startsWith('/') ? withBase(link.slice(1)) :
 		background: radial-gradient(closest-side, rgb(140 106 222 / 0.22), transparent 70%);
 		z-index: -2;
 		pointer-events: none;
-	}
-	.cloud {
-		position: absolute;
-		right: -6%;
-		top: -12%;
-		width: min(820px, 90%);
-		height: auto;
-		opacity: 0.55;
-		mix-blend-mode: screen;
-		z-index: -1;
-		pointer-events: none;
-		mask-image: radial-gradient(closest-side, #000 55%, transparent);
-		-webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
 	}
 	.eyebrow {
 		display: inline-flex;

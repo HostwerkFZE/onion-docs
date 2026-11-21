@@ -1,60 +1,43 @@
 ---
 title: Writing instructions
-description: How to put the URL and the instruction into input, and how to phrase the instruction so the answer is the one you need.
+description: How input is parsed into a URL and an instruction, its size limit, and which URLs are refused.
 ---
 
-Everything you ask of Onion goes into one field, `input`: **exactly one** `http(s)` URL and, around it, what you want from that page, in plain language.
+`input` holds one URL and the instruction for it:
 
 ```json
 { "data": { "type": "parse-requests", "attributes": {
-  "input": "https://onion4.ai/products extract product names, prices and availability"
+  "input": "https://example.com extract the page title and the first paragraph, return the result in json"
 } } }
 ```
 
-The URL can stand anywhere in the text — first, last, or in the middle of a sentence ("Extract the price from https://shop.example.com/p/1"). Punctuation right after it is not part of it. Separating the two with a blank line reads well in code:
+## Parsing
 
-```json
-"input": "https://example.com/page\n\nExtract the title."
-```
+- The URL is the one substring matching `http://…` or `https://…` (lowercase scheme), up to the first whitespace or `<`, `>`, `"`, `'`. It can stand anywhere in the text.
+- Trailing `.` `,` `;` `:` `!` `?` `)` `]` `}` `"` `'` are not part of the URL.
+- The instruction is the rest of the text, trimmed.
+- Zero URLs, or more than one (the same URL twice included): `422 validation_error`.
+- No instruction: the default instruction "Return the raw HTML source of the page." is used.
 
-- **No URL, or two of them**, is refused with `422`: one request reads one page.
-- **A URL alone**, with no instruction, returns the raw HTML of the page.
+The instruction is passed to the extraction step as written. The format of the result follows it: say "return the result in json", "as CSV", "as Markdown". For a fixed structure use [`result-schema`](/guides/results/#structured-extraction).
 
-## Say what you want back
+## Size limit
 
-The instruction is read by a language model, so write it the way you would brief a person who has never seen the page:
+The instruction is limited by the plan's prompt size, counted in characters:
 
-- **Name the fields.** "product name, price, currency and whether it is in stock" beats "product info".
-- **Say which items.** "every product in the grid", "only the first table", "the three most recent posts".
-- **Say how to write values.** "prices as numbers without the currency sign", "dates as YYYY-MM-DD".
-- **Say what to do when something is missing.** "use null when a price is not shown".
-- **Say the format.** "return the result in json", "as a CSV table", "as Markdown" — or pin the structure down exactly with a [`result-schema`](/guides/results/#structured-extraction).
+| Free | Basic | Pro | Ultimate |
+|---|---|---|---|
+| 256 | 1,024 | 4,096 | 8,192 |
 
-```text title="A vague instruction"
-https://example.com/catalog  get the products
-```
+A longer instruction: `422 validation_error`, "instructions are longer than your plan allows".
 
-```text title="One that gets you the same answer every time"
-https://example.com/catalog
-Extract every product in the main grid: name, price as a number, currency code,
-and in_stock as true or false. Use null for a price that is not shown.
-Return the result in json.
-```
+## Refused URLs
 
-## How long it can be
+Refused with `422 validation_error` before the request is stored or counted:
 
-The instruction — `input` without its URL — counts against your plan's **prompt size**, in characters: 256 on Free, 1,024 on Basic, 4,096 on Pro, 8,192 on Ultimate. Every character counts as one, whatever the alphabet. A longer instruction is refused with `422` before anything runs. See [Plans and limits](/getting-started/plans/).
+- not `http` or `https`; unparseable; no host; credentials in the URL (`user:pass@`);
+- a host without a dot; a numeric host that is not a plain IP address (`2130706433`, `0x7f000001`);
+- `localhost` and names ending in `.localhost`, `.local`, `.internal`, `.home.arpa`, `.localdomain`;
+- an IP address — given directly or among the addresses the hostname resolves to — that is loopback, private, link-local, unspecified, multicast, carrier-grade NAT (`100.64.0.0/10`), or reserved (`192.0.0.0/24`, `198.18.0.0/15`, `240.0.0.0/4`), including IPv6 forms of these.
 
-## URLs Onion will not open
-
-Onion crawls the public web. A URL that points inward is refused with `422 validation_error` before anything is counted or stored:
-
-- loopback, private, link-local and other reserved addresses — written literally, or what the hostname resolves to;
-- `localhost`, and names ending in `.local` or `.internal`;
-- hostnames without a dot;
-- numeric hosts that are not a plain IP address;
-- URLs with credentials in them (`https://user:pass@…`).
-
-## When the answer is "nothing found"
-
-If the page does not hold what you asked for, the request is `ready` with `data-found: false` and a `reason`. Read the reason: it often names what the page holds instead. Then change the instruction — or check that the URL is the page you meant: `final-url` says where the crawl ended up after redirects.
+If the hostname does not resolve at submission time, the request is accepted and the crawler decides.

@@ -3,7 +3,7 @@ import config from 'virtual:starlight/user-config';
 import Search from 'virtual:starlight/components/Search';
 import SiteTitle from 'virtual:starlight/components/SiteTitle';
 import SocialIcons from 'virtual:starlight/components/SocialIcons';
-import { topics, withBase, currentTopic, DASHBOARD_URL } from './topics';
+import { topics, withBase, currentTopic } from './topics';
 
 const shouldRenderSearch =
 	config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
@@ -27,7 +27,6 @@ const active = currentTopic(Astro.url.pathname);
 	<div class="search sl-flex print:hidden">{shouldRenderSearch && <Search />}</div>
 	<div class="right sl-hidden md:sl-flex print:hidden">
 		<div class="sl-flex social"><SocialIcons /></div>
-		<a class="dashboard" href={DASHBOARD_URL}>Dashboard</a>
 	</div>
 </div>
 
@@ -105,19 +104,5 @@ const active = currentTopic(Astro.url.pathname);
 	.social {
 		gap: 1rem;
 		align-items: center;
-	}
-	.dashboard {
-		font: var(--font-label-lg);
-		letter-spacing: var(--tracking-label-lg);
-		color: var(--bg-page);
-		background: var(--fg-primary);
-		border-radius: 10px;
-		padding: 7px 14px;
-		text-decoration: none;
-		white-space: nowrap;
-		transition: background 120ms ease;
-	}
-	.dashboard:hover {
-		background: var(--brand-medium);
 	}
 </style>
