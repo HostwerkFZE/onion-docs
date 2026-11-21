@@ -11,6 +11,9 @@ import rehypeBaseLinks from './src/plugins/rehype-base-links.mjs';
 // these defaults); the workflow passes them through.
 const site = process.env.DOCS_SITE || 'https://onion4.ai';
 const base = process.env.DOCS_BASE || '/docs';
+// The base without its trailing slash, to put in front of "/file": "/docs" or
+// "" when the site sits at the root ("//file" would name a host).
+const prefix = base.replace(/\/$/, '');
 
 export default defineConfig({
 	site,
@@ -30,9 +33,9 @@ export default defineConfig({
 			logo: { src: './src/assets/onion-logo.svg', alt: 'Onion', replacesTitle: true },
 			favicon: '/favicon.ico',
 			head: [
-				{ tag: 'link', attrs: { rel: 'icon', type: 'image/png', sizes: '32x32', href: `${base}/favicon-32.png` } },
-				{ tag: 'link', attrs: { rel: 'icon', type: 'image/png', sizes: '16x16', href: `${base}/favicon-16.png` } },
-				{ tag: 'link', attrs: { rel: 'apple-touch-icon', sizes: '180x180', href: `${base}/apple-touch-icon.png` } },
+				{ tag: 'link', attrs: { rel: 'icon', type: 'image/png', sizes: '32x32', href: `${prefix}/favicon-32.png` } },
+				{ tag: 'link', attrs: { rel: 'icon', type: 'image/png', sizes: '16x16', href: `${prefix}/favicon-16.png` } },
+				{ tag: 'link', attrs: { rel: 'apple-touch-icon', sizes: '180x180', href: `${prefix}/apple-touch-icon.png` } },
 				{ tag: 'meta', attrs: { name: 'theme-color', content: '#000000' } },
 				{ tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
 				{ tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' } },
@@ -51,6 +54,7 @@ export default defineConfig({
 			routeMiddleware: './src/route-middleware.ts',
 			components: {
 				Header: './src/components/Header.astro',
+				Sidebar: './src/components/Sidebar.astro',
 				MobileMenuFooter: './src/components/MobileMenuFooter.astro',
 				Hero: './src/components/Hero.astro',
 				ThemeProvider: './src/components/ThemeProvider.astro',

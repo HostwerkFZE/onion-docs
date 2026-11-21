@@ -14,7 +14,9 @@ permissions:
 
 concurrency:
   group: pages-${{ github.ref }}
-  cancel-in-progress: true
+  # A newer push supersedes a pull request build; on main a running deploy is
+  # left to finish (the next one waits), so Pages is never cut off midway.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:

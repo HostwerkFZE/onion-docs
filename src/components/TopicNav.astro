@@ -1,0 +1,49 @@
+---
+import { topics, withBase, currentTopic } from './topics';
+
+const active = currentTopic(Astro.url.pathname);
+---
+
+{
+	/*
+	 * The topics, for widths where the header has no room for its tabs (below
+	 * 72rem): at the top of the sidebar, which on a phone is the menu. A topic
+	 * link leads to the topic's first page, so it is marked as the current
+	 * topic (aria-current="true"), not as the current page.
+	 */
+}
+<nav class="topic-nav" aria-label="Topics">
+	{
+		topics.map((t) => (
+			<a href={withBase(t.href)} aria-current={active === t ? 'true' : undefined}>
+				{t.label}
+			</a>
+		))
+	}
+</nav>
+
+<style>
+	.topic-nav {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--border-default);
+	}
+	/* The desktop sidebar is too narrow for two equal columns ("API reference"
+	   would wrap): the chips take their own width and share each row. */
+	@media (min-width: 50rem) {
+		.topic-nav {
+			display: flex;
+			flex-wrap: wrap;
+		}
+		.topic-nav a {
+			flex: 1 1 auto;
+		}
+	}
+	@media (min-width: 72rem) {
+		.topic-nav {
+			display: none;
+		}
+	}
+</style>
